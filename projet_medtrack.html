@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedTrack — Cheikh Tidiane Mbow</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0A0A0F;--surface:#111118;--border:#1E1E2E;--accent:#00D4AA;--accent2:#0EA5E9;--text:#E2E8F0;--muted:#4A5568;--mono:'JetBrains Mono',monospace;--sans:'Syne',sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--mono);background:var(--bg);color:var(--text);overflow-x:hidden;cursor:none}
+.cursor{width:10px;height:10px;background:var(--accent);border-radius:50%;position:fixed;z-index:99999;pointer-events:none;mix-blend-mode:difference;transition:transform .1s}
+.cursor-ring{width:34px;height:34px;border:1.5px solid var(--accent);border-radius:50%;position:fixed;z-index:99998;pointer-events:none;transition:all .15s;mix-blend-mode:difference}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--accent);border-radius:3px}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:1.25rem 3rem;display:flex;align-items:center;justify-content:space-between;background:rgba(10,10,15,0.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.nav-logo{font-family:var(--mono);font-size:13px;color:var(--accent);text-decoration:none}
+.nav-logo span{color:var(--muted)}
+.nav-back{font-size:12px;color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:8px;transition:color .2s}
+.nav-back:hover{color:var(--accent)}
+
+/* HERO */
+.proj-hero{padding:8rem 3rem 5rem;display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;position:relative;overflow:hidden;min-height:100vh}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 80% 50%,rgba(14,165,233,0.08),transparent),radial-gradient(ellipse 40% 50% at 10% 80%,rgba(0,212,170,0.06),transparent)}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,212,170,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,170,0.03) 1px,transparent 1px);background-size:50px 50px}
+
+.proj-tag-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:2rem}
+.proj-tag{font-size:10px;padding:4px 12px;border:1px solid;letter-spacing:.1em}
+.tag-type{border-color:rgba(0,212,170,.3);color:var(--accent);background:rgba(0,212,170,.06)}
+.tag-status{border-color:rgba(34,197,94,.3);color:#4ADE80;background:rgba(34,197,94,.06)}
+.tag-year{border-color:var(--border);color:var(--muted)}
+
+.proj-number{font-size:11px;color:var(--muted);letter-spacing:.1em;margin-bottom:.75rem}
+.proj-title{font-family:var(--sans);font-size:clamp(40px,6vw,72px);font-weight:800;line-height:1;letter-spacing:-.03em;margin-bottom:.5rem}
+.proj-title em{color:var(--accent);font-style:normal}
+.proj-subtitle{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:2.5rem;max-width:460px}
+
+.proj-stats-row{display:flex;gap:2rem;margin-bottom:2.5rem}
+.pstat{text-align:left}
+.pstat-n{font-family:var(--sans);font-size:28px;font-weight:800;color:var(--accent)}
+.pstat-l{font-size:10px;color:var(--muted);letter-spacing:.08em;margin-top:2px}
+
+.cta-row{display:flex;gap:12px;flex-wrap:wrap}
+.btn-p{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#0A0A0F;padding:11px 22px;font-family:var(--mono);font-size:12px;font-weight:700;border:none;cursor:none;text-decoration:none;transition:all .2s;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%)}
+.btn-p:hover{opacity:.85;transform:translateY(-2px)}
+.btn-o{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);color:var(--muted);padding:11px 22px;font-family:var(--mono);font-size:12px;text-decoration:none;transition:all .2s}
+.btn-o:hover{border-color:var(--accent);color:var(--accent)}
+
+/* MOCKUP */
+.mockup-wrap{position:relative;z-index:1}
+.phone-frame{width:260px;height:520px;background:#1a1a26;border-radius:36px;border:2px solid #2a2a3e;margin:0 auto;overflow:hidden;position:relative;box-shadow:0 40px 120px rgba(0,0,0,.7),0 0 0 1px rgba(0,212,170,.08)}
+.phone-screen{width:100%;height:100%;background:linear-gradient(180deg,#0D1B2A 0%,#071628 100%);display:flex;flex-direction:column;overflow:hidden}
+.phone-top{padding:1rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.05)}
+.phone-app-name{font-size:11px;font-weight:600;color:#fff}
+.phone-status{font-size:9px;color:rgba(255,255,255,.3)}
+.notch{width:70px;height:20px;background:#1a1a26;border-radius:0 0 14px 14px;position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:10}
+.phone-content{padding:.75rem;flex:1;overflow:hidden}
+.card-sm{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:.75rem;margin-bottom:.6rem}
+.card-sm-header{display:flex;align-items:center;gap:8px;margin-bottom:.4rem}
+.avatar-sm{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.card-sm-name{font-size:10px;font-weight:600;color:#fff}
+.card-sm-sub{font-size:9px;color:rgba(255,255,255,.3)}
+.status-dot{width:6px;height:6px;border-radius:50%;margin-left:auto;flex-shrink:0}
+.dot-green{background:#4ADE80}
+.dot-amber{background:#FBBF24}
+.mini-bar{height:3px;background:rgba(255,255,255,.06);border-radius:2px;margin-top:.5rem;overflow:hidden}
+.mini-fill{height:100%;border-radius:2px}
+.phone-nav{padding:.5rem .75rem;border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-around}
+.nav-icon-sm{font-size:16px;opacity:.4}
+.nav-icon-sm.active{opacity:1}
+.floating-badge{position:absolute;top:80px;right:-20px;background:var(--accent);color:#0A0A0F;border-radius:8px;padding:8px 12px;font-size:10px;font-weight:700;box-shadow:0 8px 24px rgba(0,212,170,.4);animation:float 3s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+/* SECTIONS */
+.section{padding:6rem 3rem;border-top:1px solid var(--border)}
+.section-label{font-size:10px;color:var(--accent);letter-spacing:.2em;text-transform:uppercase;margin-bottom:.75rem}
+.section-title{font-family:var(--sans);font-size:clamp(28px,3vw,40px);font-weight:800;letter-spacing:-.02em;margin-bottom:3rem}
+
+/* FEATURES */
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border)}
+.feat-card{background:var(--surface);padding:2rem;transition:background .2s}
+.feat-card:hover{background:#13131F}
+.feat-icon{font-size:28px;margin-bottom:1rem;display:block}
+.feat-title{font-family:var(--sans);font-size:16px;font-weight:700;color:var(--text);margin-bottom:.6rem}
+.feat-desc{font-size:12px;color:var(--muted);line-height:1.7}
+
+/* TECH STACK */
+.tech-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem}
+.tech-item{background:var(--surface);border:1px solid var(--border);padding:1.25rem;display:flex;align-items:center;gap:12px;transition:border-color .2s}
+.tech-item:hover{border-color:var(--accent)}
+.tech-ico{font-size:24px;flex-shrink:0}
+.tech-info-name{font-size:13px;font-weight:600;color:var(--text)}
+.tech-info-role{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* ARCH DIAGRAM */
+.arch{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;margin-top:2rem}
+.arch-box{background:var(--surface);border:1px solid var(--border);padding:1rem 1.5rem;text-align:center;min-width:120px}
+.arch-box-title{font-size:11px;color:var(--accent);margin-bottom:.25rem;letter-spacing:.06em}
+.arch-box-sub{font-size:10px;color:var(--muted)}
+.arch-arrow{font-size:18px;color:var(--muted);padding:0 .5rem}
+
+/* SCREENSHOTS / SCREENS */
+.screens-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:2rem}
+.screen-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.screen-preview{height:180px;display:flex;flex-direction:column;padding:1rem;position:relative;overflow:hidden}
+.screen-title-sm{font-size:10px;color:var(--muted);margin-bottom:.75rem;letter-spacing:.06em}
+.screen-label{position:absolute;bottom:0;left:0;right:0;padding:8px;background:linear-gradient(transparent,rgba(10,10,15,.9));font-size:10px;color:var(--text)}
+
+/* TIMELINE */
+.timeline{position:relative;padding-left:2rem}
+.timeline::before{content:'';position:absolute;left:0;top:0;bottom:0;width:1px;background:var(--border)}
+.tl-item{position:relative;padding-bottom:2rem;padding-left:1.5rem}
+.tl-item::before{content:'';position:absolute;left:-.45rem;top:4px;width:10px;height:10px;border-radius:50%;background:var(--accent);border:2px solid var(--bg)}
+.tl-date{font-size:10px;color:var(--accent);letter-spacing:.08em;margin-bottom:.35rem}
+.tl-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:.25rem}
+.tl-desc{font-size:12px;color:var(--muted);line-height:1.6}
+
+/* BACK LINK */
+.back-section{padding:4rem 3rem;text-align:center;border-top:1px solid var(--border)}
+.back-link{font-family:var(--sans);font-size:20px;font-weight:700;color:var(--text);text-decoration:none;border-bottom:2px solid var(--accent);padding-bottom:4px;transition:color .2s}
+.back-link:hover{color:var(--accent)}
+
+.fade-up{opacity:0;transform:translateY(24px);transition:all .7s cubic-bezier(.16,1,.3,1)}
+.fade-up.visible{opacity:1;transform:translateY(0)}
+@media(max-width:768px){
+  .proj-hero{grid-template-columns:1fr;padding:7rem 1.5rem 3rem;min-height:auto;gap:3rem}
+  .features-grid{grid-template-columns:1fr}
+  .screens-row{grid-template-columns:1fr 1fr}
+  .tech-grid{grid-template-columns:1fr}
+  .section{padding:4rem 1.5rem}
+  .arch{flex-direction:column}
+}
+</style>
+</head>
+<body>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="ring"></div>
+
+<nav>
+  <a href="portfolio_cheikh_mbow.html" class="nav-logo"><span>~/</span>ctm.dev</a>
+  <a href="portfolio_cheikh_mbow.html" class="nav-back">← Retour au portfolio</a>
+</nav>
+
+<!-- HERO -->
+<section class="proj-hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div style="position:relative;z-index:1">
+    <div class="proj-number">001 / 005</div>
+    <div class="proj-tag-row">
+      <span class="proj-tag tag-type">FULL-STACK</span>
+      <span class="proj-tag tag-status">● DÉPLOYÉ</span>
+      <span class="proj-tag tag-year">2024</span>
+    </div>
+    <h1 class="proj-title">Med<em>Track</em></h1>
+    <p class="proj-subtitle">Plateforme complète de gestion de dossiers médicaux pour cliniques et cabinets. Web + Mobile, en production dans 2 cliniques à Dakar.</p>
+    <div class="proj-stats-row">
+      <div class="pstat"><div class="pstat-n">2</div><div class="pstat-l">CLINIQUES</div></div>
+      <div class="pstat"><div class="pstat-n">500+</div><div class="pstat-l">PATIENTS</div></div>
+      <div class="pstat"><div class="pstat-n">6</div><div class="pstat-l">MOIS DEV</div></div>
+    </div>
+    <div class="cta-row">
+      <a href="medtrack.html" class="btn-p">▶ Voir la démo</a>
+      <a href="#" class="btn-o">⌥ GitHub</a>
+    </div>
+  </div>
+  <div class="mockup-wrap">
+    <div class="floating-badge">+23 RDV auj.</div>
+    <div class="phone-frame">
+      <div class="notch"></div>
+      <div class="phone-screen">
+        <div class="phone-top">
+          <div class="phone-app-name">🏥 MedTrack</div>
+          <div class="phone-status">9:41 ▪▪▪</div>
+        </div>
+        <div class="phone-content">
+          <div style="font-size:9px;color:rgba(255,255,255,.3);margin-bottom:.5rem;letter-spacing:.08em">PATIENTS DU JOUR</div>
+          <div class="card-sm">
+            <div class="card-sm-header">
+              <div class="avatar-sm" style="background:#1e3a5f">👤</div>
+              <div><div class="card-sm-name">Fatou Diallo</div><div class="card-sm-sub">Consultation 09h30</div></div>
+              <div class="status-dot dot-green"></div>
+            </div>
+            <div class="mini-bar"><div class="mini-fill" style="width:100%;background:#4ADE80"></div></div>
+          </div>
+          <div class="card-sm">
+            <div class="card-sm-header">
+              <div class="avatar-sm" style="background:#2d1f4e">👤</div>
+              <div><div class="card-sm-name">Moussa Sow</div><div class="card-sm-sub">Suivi tensionnel 11h00</div></div>
+              <div class="status-dot dot-amber"></div>
+            </div>
+            <div class="mini-bar"><div class="mini-fill" style="width:60%;background:#FBBF24"></div></div>
+          </div>
+          <div class="card-sm">
+            <div class="card-sm-header">
+              <div class="avatar-sm" style="background:#1a2e1a">👤</div>
+              <div><div class="card-sm-name">Aminata Ndiaye</div><div class="card-sm-sub">Pédiatrie 14h00</div></div>
+              <div class="status-dot" style="background:#4A5568"></div>
+            </div>
+            <div class="mini-bar"><div class="mini-fill" style="width:20%;background:rgba(255,255,255,.2)"></div></div>
+          </div>
+          <div style="margin-top:.75rem;padding:.6rem;background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.2);border-radius:8px">
+            <div style="font-size:9px;color:var(--accent);margin-bottom:.25rem">ORDONNANCE RAPIDE</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.5)">Paracétamol 500mg × 3/j</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.5)">Amoxicilline 1g × 2/j</div>
+          </div>
+        </div>
+        <div class="phone-nav">
+          <span class="nav-icon-sm active">🏠</span>
+          <span class="nav-icon-sm">📋</span>
+          <span class="nav-icon-sm">📅</span>
+          <span class="nav-icon-sm">💊</span>
+          <span class="nav-icon-sm">👤</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section">
+  <div class="section-label fade-up">Fonctionnalités</div>
+  <div class="section-title fade-up">Ce que MedTrack fait</div>
+  <div class="features-grid">
+    <div class="feat-card fade-up">
+      <span class="feat-icon">📋</span>
+      <div class="feat-title">Dossiers médicaux numériques</div>
+      <div class="feat-desc">Création et gestion complète des dossiers patients. Historique médical, antécédents, allergies, résultats d'examens — tout centralisé et sécurisé.</div>
+    </div>
+    <div class="feat-card fade-up">
+      <span class="feat-icon">📅</span>
+      <div class="feat-title">Prise de RDV intelligente</div>
+      <div class="feat-desc">Calendrier interactif pour médecins et patients. Rappels automatiques par SMS, gestion des annulations et liste d'attente en temps réel.</div>
+    </div>
+    <div class="feat-card fade-up">
+      <span class="feat-icon">💊</span>
+      <div class="feat-title">Ordonnances numériques</div>
+      <div class="feat-desc">Génération et signature électronique d'ordonnances. QR code unique pour vérification en pharmacie. Historique des prescriptions par patient.</div>
+    </div>
+    <div class="feat-card fade-up">
+      <span class="feat-icon">📊</span>
+      <div class="feat-title">Dashboard admin clinique</div>
+      <div class="feat-desc">Vue d'ensemble en temps réel : taux d'occupation, revenus, statistiques par médecin, alertes stock médicaments, rapports mensuels PDF.</div>
+    </div>
+    <div class="feat-card fade-up">
+      <span class="feat-icon">🔐</span>
+      <div class="feat-title">Sécurité & Rôles</div>
+      <div class="feat-desc">Authentification Firebase avec 4 niveaux d'accès : Admin, Médecin, Infirmier, Réceptionniste. Données chiffrées. Conforme RGPD.</div>
+    </div>
+    <div class="feat-card fade-up">
+      <span class="feat-icon">📱</span>
+      <div class="feat-title">App Mobile (iOS & Android)</div>
+      <div class="feat-desc">Application React Native pour médecins en déplacement. Consultation des dossiers, validation d'ordonnances et notifications push en temps réel.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ARCHITECTURE -->
+<section class="section">
+  <div class="section-label fade-up">Architecture</div>
+  <div class="section-title fade-up">Comment c'est construit</div>
+  <div class="arch fade-up">
+    <div class="arch-box"><div class="arch-box-title">FRONT WEB</div><div class="arch-box-sub">React + Next.js</div></div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-box"><div class="arch-box-title">API REST</div><div class="arch-box-sub">Node.js + Express</div></div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-box"><div class="arch-box-title">BASE DE DONNÉES</div><div class="arch-box-sub">MongoDB Atlas</div></div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-box"><div class="arch-box-title">AUTH & PUSH</div><div class="arch-box-sub">Firebase</div></div>
+  </div>
+  <div class="arch fade-up" style="margin-top:1px">
+    <div class="arch-box"><div class="arch-box-title">APP MOBILE</div><div class="arch-box-sub">React Native</div></div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-box"><div class="arch-box-title">STOCKAGE</div><div class="arch-box-sub">AWS S3</div></div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-box"><div class="arch-box-title">SMS / RAPPELS</div><div class="arch-box-sub">Twilio API</div></div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-box"><div class="arch-box-title">DÉPLOIEMENT</div><div class="arch-box-sub">Vercel + Railway</div></div>
+  </div>
+</section>
+
+<!-- TECH STACK -->
+<section class="section">
+  <div class="section-label fade-up">Stack technique</div>
+  <div class="section-title fade-up">Technologies utilisées</div>
+  <div class="tech-grid">
+    <div class="tech-item fade-up"><span class="tech-ico">⚛️</span><div><div class="tech-info-name">React + Next.js</div><div class="tech-info-role">Interface web — SSR, routing, performance</div></div></div>
+    <div class="tech-item fade-up"><span class="tech-ico">📱</span><div><div class="tech-info-name">React Native</div><div class="tech-info-role">Application mobile iOS & Android</div></div></div>
+    <div class="tech-item fade-up"><span class="tech-ico">🟩</span><div><div class="tech-info-name">Node.js + Express</div><div class="tech-info-role">API REST — logique métier, authentification</div></div></div>
+    <div class="tech-item fade-up"><span class="tech-ico">🍃</span><div><div class="tech-info-name">MongoDB Atlas</div><div class="tech-info-role">Base de données — dossiers patients, RDV</div></div></div>
+    <div class="tech-item fade-up"><span class="tech-ico">🔥</span><div><div class="tech-info-name">Firebase Auth + FCM</div><div class="tech-info-role">Authentification & notifications push</div></div></div>
+    <div class="tech-item fade-up"><span class="tech-ico">📦</span><div><div class="tech-info-name">AWS S3</div><div class="tech-info-role">Stockage sécurisé des documents médicaux</div></div></div>
+  </div>
+</section>
+
+<!-- TIMELINE -->
+<section class="section">
+  <div class="section-label fade-up">Chronologie</div>
+  <div class="section-title fade-up">Du concept au déploiement</div>
+  <div class="timeline">
+    <div class="tl-item fade-up">
+      <div class="tl-date">JANVIER 2024</div>
+      <div class="tl-title">Analyse des besoins & wireframes</div>
+      <div class="tl-desc">Rencontres avec 2 médecins et une secrétaire médicale à Dakar. Identification des points de friction dans la gestion papier. Maquettes Figma validées.</div>
+    </div>
+    <div class="tl-item fade-up">
+      <div class="tl-date">FÉVRIER — MARS 2024</div>
+      <div class="tl-title">Développement du back-end & API</div>
+      <div class="tl-desc">Architecture de la base de données MongoDB, API REST complète avec 40+ endpoints. Système d'authentification multi-rôles avec Firebase.</div>
+    </div>
+    <div class="tl-item fade-up">
+      <div class="tl-date">AVRIL — MAI 2024</div>
+      <div class="tl-title">Interface web & application mobile</div>
+      <div class="tl-desc">Dashboard admin React/Next.js, interface médecin, module ordonnances. Développement parallèle de l'app React Native avec sync temps réel.</div>
+    </div>
+    <div class="tl-item fade-up">
+      <div class="tl-date">JUIN 2024</div>
+      <div class="tl-title">Tests & déploiement en production</div>
+      <div class="tl-desc">Tests utilisateurs dans la Clinique du Plateau, Dakar. Corrections de bugs critiques. Déploiement sur Vercel + Railway. Formation du personnel sur site.</div>
+    </div>
+  </div>
+</section>
+
+<div class="back-section">
+  <a href="medtrack.html" class="back-link">← retour</a>
+</div>
+
+<script>
+const cur=document.getElementById('cursor'),ring=document.getElementById('ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx-5+'px';cur.style.top=my-5+'px'});
+(function a(){rx+=(mx-rx-17)*.12;ry+=(my-ry-17)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(a)})();
+document.querySelectorAll('a,button').forEach(el=>{el.addEventListener('mouseenter',()=>{cur.style.transform='scale(2.5)';ring.style.transform='scale(1.5)'});el.addEventListener('mouseleave',()=>{cur.style.transform='scale(1)';ring.style.transform='scale(1)'})});
+const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:.15});
+document.querySelectorAll('.fade-up').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>

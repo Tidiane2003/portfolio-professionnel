@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduSN — Plateforme e-Learning · Démo</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0A0F;--s1:#0D1117;--s2:#111118;--s3:#1A1A26;
+  --bd:#1E1E2E;--bd2:#2D2D40;
+  --ac:#10B981;--ac2:#0EA5E9;--ac3:#8B5CF6;
+  --txt:#E2E8F0;--txt2:#94A3B8;--txt3:#64748B;
+  --red:#EF4444;--amber:#F59E0B;--green:#10B981;
+  --fnt:'Inter',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--fnt);background:var(--bg);color:var(--txt);overflow:hidden;height:100vh}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--s2)}
+::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:4px}
+::-webkit-scrollbar-thumb:hover{background:var(--ac)}
+
+/* ── LOGIN ── */
+#login-screen{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:var(--bg)}
+.lw{display:flex;width:880px;max-width:96vw;height:560px;background:var(--s1);border:1px solid var(--bd);border-radius:20px;overflow:hidden;box-shadow:0 40px 120px rgba(0,0,0,.7)}
+.ll{width:320px;flex-shrink:0;background:linear-gradient(160deg,#061a12 0%,var(--bg) 100%);padding:2rem;display:flex;flex-direction:column;justify-content:space-between;border-right:1px solid var(--bd)}
+.ll-logo{display:flex;align-items:center;gap:10px;margin-bottom:1.5rem}
+.ll-logo-ico{width:40px;height:40px;border-radius:11px;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);display:flex;align-items:center;justify-content:center;font-size:20px}
+.ll-logo-name{font-size:17px;font-weight:800;color:#fff}
+.ll-logo-sub{font-size:9px;color:var(--ac);letter-spacing:.1em;text-transform:uppercase}
+.ll-feats{display:flex;flex-direction:column;gap:8px}
+.ll-feat{display:flex;align-items:center;gap:9px;padding:9px 11px;background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:10px}
+.ll-feat-ico{font-size:16px;flex-shrink:0}
+.ll-feat-txt{font-size:10px;color:var(--txt2);line-height:1.4}
+.ll-feat-txt strong{color:var(--txt);display:block;font-size:11px;margin-bottom:1px}
+.lr{flex:1;padding:2.25rem;display:flex;flex-direction:column;justify-content:center}
+.lr h2{font-size:21px;font-weight:800;color:#fff;margin-bottom:3px}
+.lr p{font-size:12px;color:var(--txt3);margin-bottom:1.25rem}
+.fi{width:100%;padding:10px 13px;background:var(--s3);border:1px solid var(--bd);border-radius:9px;font-size:12px;color:var(--txt);font-family:var(--fnt);outline:none;transition:border .2s}
+.fi:focus{border-color:var(--ac)}
+.fi::placeholder{color:var(--txt3)}
+.fg{margin-bottom:.875rem}
+.fl{display:block;font-size:10px;font-weight:600;color:var(--txt3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px}
+.btn-login{width:100%;padding:11px;background:var(--ac);color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;margin-top:.25rem}
+.btn-login:hover{background:#059669;transform:translateY(-1px)}
+.demo-box{margin-top:1rem;padding:11px;background:var(--s3);border:1px solid var(--bd);border-radius:9px}
+.demo-box-title{font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px}
+.demo-acc{display:flex;justify-content:space-between;align-items:center;padding:5px 7px;border-radius:6px;cursor:pointer;transition:background .15s}
+.demo-acc:hover{background:rgba(255,255,255,.05)}
+.demo-acc-role{font-size:11px;font-weight:600;color:var(--txt2)}
+.demo-acc-email{font-size:10px;color:var(--txt3);font-family:var(--mono)}
+
+/* ── APP LAYOUT ── */
+#app{display:none;height:100vh;overflow:hidden;flex-direction:column}
+#app.active{display:flex}
+.app-wrap{display:flex;flex:1;overflow:hidden}
+
+/* SIDEBAR */
+.sidebar{width:220px;flex-shrink:0;background:var(--s1);border-right:1px solid var(--bd);display:flex;flex-direction:column}
+.sb-logo{padding:1rem 1.2rem;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:9px}
+.sb-ico{width:30px;height:30px;border-radius:8px;background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.sb-name{font-size:13px;font-weight:700;color:#fff}
+.sb-env{font-size:9px;color:var(--ac);letter-spacing:.08em}
+.nav-sec{font-size:9px;font-weight:700;color:var(--txt3);letter-spacing:.1em;text-transform:uppercase;padding:.7rem 1.2rem .3rem}
+.nav-item{display:flex;align-items:center;gap:9px;padding:7px 1.2rem;cursor:pointer;font-size:12px;color:var(--txt3);border-left:2px solid transparent;transition:all .15s;user-select:none}
+.nav-item:hover{background:var(--s3);color:var(--txt2)}
+.nav-item.active{background:rgba(16,185,129,.08);color:var(--ac);border-left-color:var(--ac);border-radius:0 8px 8px 0}
+.nav-ico{font-size:14px;width:17px;text-align:center;flex-shrink:0}
+.sb-foot{margin-top:auto;padding:.9rem 1.2rem;border-top:1px solid var(--bd);display:flex;align-items:center;gap:9px}
+.sf-av{width:29px;height:29px;border-radius:50%;background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.25);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--ac);flex-shrink:0}
+.sf-name{font-size:12px;font-weight:600;color:var(--txt2)}
+.sf-role{font-size:10px;color:var(--txt3)}
+.sf-logout{margin-left:auto;background:none;border:none;cursor:pointer;font-size:16px;color:var(--txt3);transition:color .15s}
+.sf-logout:hover{color:var(--red)}
+
+/* TOPBAR */
+.topbar{height:50px;flex-shrink:0;background:var(--s1);border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;padding:0 1.4rem}
+.tp-title{font-size:14px;font-weight:700;color:#fff}
+.tp-sub{font-size:10px;color:var(--txt3)}
+.tp-right{display:flex;align-items:center;gap:9px}
+.xp-badge{display:flex;align-items:center;gap:5px;padding:4px 10px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);border-radius:20px;font-size:11px;font-weight:700;color:var(--amber)}
+.notif-btn{position:relative;width:30px;height:30px;border-radius:7px;background:var(--s3);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px}
+.notif-dot{position:absolute;top:-3px;right:-3px;width:13px;height:13px;border-radius:50%;background:var(--red);color:#fff;font-size:8px;display:flex;align-items:center;justify-content:center;font-weight:700}
+.tp-user{display:flex;align-items:center;gap:7px;padding:4px 9px;background:var(--s3);border:1px solid var(--bd);border-radius:7px}
+.tu-av{width:22px;height:22px;border-radius:50%;background:rgba(16,185,129,.12);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--ac)}
+.tu-name{font-size:11px;font-weight:600;color:var(--txt2)}
+
+/* CONTENT */
+.content{flex:1;overflow-y:auto;padding:1.2rem 1.4rem}
+.page{display:none}.page.active{display:block;animation:fadeUp .25s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* CARDS */
+.card{background:var(--s2);border:1px solid var(--bd);border-radius:11px;padding:1.1rem}
+.card-hover{background:var(--s2);border:1px solid var(--bd);border-radius:11px;padding:1.1rem;transition:all .2s;cursor:pointer}
+.card-hover:hover{border-color:var(--bd2);box-shadow:0 4px 20px rgba(0,0,0,.3)}
+
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.7rem;margin-bottom:1.1rem}
+.kpi{background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:.9rem}
+.kpi-val{font-size:22px;font-weight:800;margin-bottom:2px}
+.kpi-lbl{font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:.05em}
+.kpi-chg{font-size:10px;margin-top:3px;color:var(--green)}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;border:1px solid}
+.b-green{background:rgba(16,185,129,.1);color:#34D399;border-color:rgba(16,185,129,.2)}
+.b-blue{background:rgba(14,165,233,.1);color:#7DD3FC;border-color:rgba(14,165,233,.2)}
+.b-amber{background:rgba(245,158,11,.1);color:#FCD34D;border-color:rgba(245,158,11,.2)}
+.b-red{background:rgba(239,68,68,.1);color:#FCA5A5;border-color:rgba(239,68,68,.2)}
+.b-purple{background:rgba(139,92,246,.1);color:#C4B5FD;border-color:rgba(139,92,246,.2)}
+.b-gray{background:rgba(100,116,139,.1);color:var(--txt2);border-color:rgba(100,116,139,.2)}
+.b-ac{background:rgba(16,185,129,.1);color:var(--ac);border-color:rgba(16,185,129,.2)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:7px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--bd);background:var(--s3);color:var(--txt2);transition:all .15s;font-family:var(--fnt)}
+.btn:hover{background:var(--bd);color:var(--txt)}
+.btn-ac{background:var(--ac);color:#fff;border-color:var(--ac);font-weight:700}
+.btn-ac:hover{background:#059669}
+.btn-out{border:1px solid rgba(16,185,129,.3);color:var(--ac);background:transparent}
+.btn-out:hover{background:rgba(16,185,129,.08)}
+
+/* GRID */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;margin-bottom:.9rem}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.9rem;margin-bottom:.9rem}
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:.875rem}
+.sh-title{font-size:13px;font-weight:700;color:#fff}
+.sh-sub{font-size:10px;color:var(--txt3);margin-top:1px}
+.sh-action{font-size:11px;color:var(--ac);cursor:pointer;transition:opacity .15s}
+.sh-action:hover{opacity:.75}
+
+/* PROGRESS */
+.prog-bar{height:5px;background:var(--bd);border-radius:3px;overflow:hidden;margin-top:4px}
+.prog-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--ac),var(--ac2));transition:width 1s cubic-bezier(.16,1,.3,1)}
+
+/* COURSE CARD */
+.course-card{background:var(--s2);border:1px solid var(--bd);border-radius:11px;overflow:hidden;transition:all .2s;cursor:pointer}
+.course-card:hover{border-color:var(--bd2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.course-thumb{height:110px;display:flex;align-items:center;justify-content:center;font-size:40px;position:relative}
+.course-body{padding:.875rem}
+.course-title{font-size:12px;font-weight:700;color:var(--txt);margin-bottom:3px;line-height:1.4}
+.course-meta{font-size:10px;color:var(--txt3);display:flex;gap:8px;margin-top:4px}
+.course-badge{position:absolute;top:7px;right:7px;font-size:9px;padding:2px 7px;border-radius:10px;font-weight:700}
+.free-badge{background:rgba(16,185,129,.15);color:var(--ac)}
+.cert-badge{background:rgba(245,158,11,.12);color:var(--amber)}
+
+/* LESSON ITEM */
+.lesson-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:7px;cursor:pointer;transition:all .15s;border:1px solid transparent;font-size:11px}
+.lesson-item:hover{background:var(--s3)}
+.lesson-item.active{background:rgba(16,185,129,.08);border-color:rgba(16,185,129,.2);color:var(--ac)}
+.lesson-item.done{color:var(--txt3)}
+.lesson-dot{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0;border:1px solid}
+
+/* QUIZ OPTIONS */
+.quiz-opt{display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:9px;border:1px solid var(--bd);cursor:pointer;transition:all .15s;font-size:12px;margin-bottom:7px}
+.quiz-opt:hover{border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.04)}
+.quiz-opt.selected{border-color:var(--ac);background:rgba(16,185,129,.08);color:var(--ac)}
+.quiz-opt.correct{border-color:var(--green);background:rgba(16,185,129,.1);color:#34D399}
+.quiz-opt.wrong{border-color:var(--red);background:rgba(239,68,68,.08);color:#FCA5A5}
+.opt-letter{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;border:1px solid var(--bd2);flex-shrink:0}
+
+/* CERT CARD */
+.cert-card{background:linear-gradient(135deg,#0a1a0e 0%,var(--bg) 100%);border:1px solid rgba(16,185,129,.2);border-radius:14px;padding:1.5rem;position:relative;overflow:hidden}
+.cert-card::before{content:'';position:absolute;top:-40px;right:-40px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,rgba(16,185,129,.08),transparent);pointer-events:none}
+
+/* VIDEO PLAYER */
+.video-player{background:#000;border-radius:10px;overflow:hidden;position:relative}
+.video-screen{background:linear-gradient(135deg,#061209,#0a1f0e);aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;position:relative}
+.play-btn{width:48px;height:48px;border-radius:50%;background:rgba(16,185,129,.9);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;transition:all .2s;z-index:1}
+.play-btn:hover{background:var(--ac);transform:scale(1.08)}
+.video-bar{padding:8px 12px;background:rgba(0,0,0,.6);display:flex;align-items:center;gap:8px}
+.vid-prog{flex:1;height:3px;background:rgba(255,255,255,.15);border-radius:2px;overflow:hidden;cursor:pointer}
+.vid-fill{height:100%;background:var(--ac);border-radius:2px;width:42%;transition:width .3s}
+
+/* STATS RING */
+.ring-wrap{position:relative;display:inline-block}
+svg.ring-svg{transform:rotate(-90deg)}
+
+/* TOAST */
+.toast{position:fixed;top:18px;right:18px;z-index:9999;display:none;background:var(--s1);border:1px solid var(--bd);border-left:3px solid var(--ac);border-radius:9px;padding:11px 15px;max-width:300px;box-shadow:0 8px 28px rgba(0,0,0,.4);animation:slideIn .3s ease}
+@keyframes slideIn{from{transform:translateX(110%);opacity:0}to{transform:none;opacity:1}}
+.toast.show{display:block}
+.toast-title{font-size:12px;font-weight:700;color:#fff}
+.toast-msg{font-size:10px;color:var(--txt3);margin-top:2px}
+
+/* MODAL */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(3px);z-index:8000;display:none;align-items:center;justify-content:center}
+.modal-ov.open{display:flex;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{background:var(--s1);border:1px solid var(--bd);border-radius:14px;width:100%;max-width:480px;max-height:86vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.modal-hd{padding:1.1rem 1.4rem;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-size:14px;font-weight:700;color:#fff}
+.modal-close{background:none;border:none;font-size:18px;color:var(--txt3);cursor:pointer}
+.modal-body{padding:1.4rem}
+.modal-ft{padding:.9rem 1.4rem;border-top:1px solid var(--bd);display:flex;justify-content:flex-end;gap:7px}
+
+/* STREAK */
+.streak-days{display:flex;gap:4px}
+.streak-day{width:24px;height:24px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700}
+
+/* SCROLLBAR hide on sidebar */
+.sidebar-scroll{overflow-y:auto;flex:1;scrollbar-width:thin}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"><div class="toast-title" id="toast-title"></div><div class="toast-msg" id="toast-msg"></div></div>
+<div class="modal-ov" id="modal-ov" onclick="if(event.target===this)closeModal()"><div class="modal" id="modal-box"></div></div>
+
+<!-- ── LOGIN ── -->
+<div id="login-screen">
+  <div class="lw">
+    <div class="ll">
+      <div>
+        <div class="ll-logo">
+          <div class="ll-logo-ico">🎓</div>
+          <div><div class="ll-logo-name">EduSN</div><div class="ll-logo-sub">E-Learning · Sénégal</div></div>
+        </div>
+        <p style="font-size:12px;color:var(--txt2);line-height:1.7;margin-bottom:1.25rem">
+          La plateforme d'apprentissage pensée pour les étudiants sénégalais.
+        </p>
+        <div class="ll-feats">
+          <div class="ll-feat"><span class="ll-feat-ico">🎬</span><span class="ll-feat-txt"><strong>Cours vidéo HD (AWS S3/CloudFront)</strong>Streaming adaptatif, même en 3G</span></div>
+          <div class="ll-feat"><span class="ll-feat-ico">🧪</span><span class="ll-feat-txt"><strong>Quiz interactifs</strong>Feedback immédiat à chaque leçon</span></div>
+          <div class="ll-feat"><span class="ll-feat-ico">🏅</span><span class="ll-feat-txt"><strong>Certificats PDF (PDFKit)</strong>QR Code vérifiable — LinkedIn ready</span></div>
+          <div class="ll-feat"><span class="ll-feat-ico">📊</span><span class="ll-feat-txt"><strong>Suivi progression (PostgreSQL)</strong>XP, streaks et objectifs hebdo</span></div>
+        </div>
+      </div>
+      <p style="font-size:10px;color:var(--txt3)">© 2025 EduSN · Dakar, Sénégal 🇸🇳</p>
+    </div>
+    <div class="lr">
+      <h2>Connexion</h2>
+      <p>Accédez à votre espace EduSN</p>
+      <div class="fg"><label class="fl">Email</label><input class="fi" id="li-email" type="email" value="student@edusn.sn" placeholder="vous@email.sn"></div>
+      <div class="fg"><label class="fl">Mot de passe</label><input class="fi" id="li-pass" type="password" value="Student12" placeholder="••••••••"></div>
+      <button class="btn-login" onclick="doLogin()">Se connecter →</button>
+      <div class="demo-box">
+        <div class="demo-box-title">🔑 Comptes démo — cliquez pour remplir</div>
+        <div class="demo-acc" onclick="fillDemo('student@edusn.sn','Student12')">
+          <span class="demo-acc-role">👨‍🎓 Étudiant</span><span class="demo-acc-email">student@edusn.sn</span>
+        </div>
+        <div class="demo-acc" onclick="fillDemo('cheikh@edusn.sn','Cheikh123')">
+          <span class="demo-acc-role">👨‍💻 Instructeur</span><span class="demo-acc-email">cheikh@edusn.sn</span>
+        </div>
+        <div class="demo-acc" onclick="fillDemo('admin@edusn.sn','Admin1234')">
+          <span class="demo-acc-role">🔑 Admin</span><span class="demo-acc-email">admin@edusn.sn</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── APP ── -->
+<div id="app">
+  <div class="app-wrap">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sb-logo">
+        <div class="sb-ico">🎓</div>
+        <div><div class="sb-name">EduSN</div><div class="sb-env">Démo Live</div></div>
+      </div>
+      <div class="sidebar-scroll">
+        <div class="nav-sec">Apprentissage</div>
+        <div class="nav-item active" onclick="goPage('dashboard',this)"><span class="nav-ico">🏠</span><span>Accueil</span></div>
+        <div class="nav-item" onclick="goPage('my-courses',this)"><span class="nav-ico">📚</span><span>Mes cours</span></div>
+        <div class="nav-item" onclick="goPage('learn',this)"><span class="nav-ico">🎬</span><span>Lecteur</span></div>
+        <div class="nav-item" onclick="goPage('quiz',this)"><span class="nav-ico">🧪</span><span>Quiz</span></div>
+        <div class="nav-item" onclick="goPage('certificates',this)"><span class="nav-ico">🏅</span><span>Certificats</span></div>
+        <div class="nav-sec">Plateforme</div>
+        <div class="nav-item" onclick="goPage('catalogue',this)"><span class="nav-ico">🔍</span><span>Catalogue</span></div>
+        <div class="nav-item" onclick="goPage('progress',this)"><span class="nav-ico">📈</span><span>Progression</span></div>
+        <div class="nav-item" onclick="goPage('profile',this)"><span class="nav-ico">👤</span><span>Profil</span></div>
+      </div>
+      <div class="sb-foot">
+        <div class="sf-av" id="sf-av">AM</div>
+        <div><div class="sf-name" id="sf-name">Amadou</div><div class="sf-role" id="sf-role">Étudiant</div></div>
+        <button class="sf-logout" onclick="doLogout()" title="Déconnexion">⏻</button>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
+      <div class="topbar">
+        <div><div class="tp-title" id="page-title">Accueil</div><div class="tp-sub" id="page-date"></div></div>
+        <div class="tp-right">
+          <div class="xp-badge">⭐ <span id="xp-val">420</span> XP</div>
+          <div class="notif-btn" onclick="openNotifs()">🔔<div class="notif-dot">3</div></div>
+          <div class="tp-user">
+            <div class="tu-av" id="tu-av">AM</div>
+            <div class="tu-name" id="tu-name">Amadou Ndiaye</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+
+        <!-- DASHBOARD -->
+        <div class="page active" id="page-dashboard">
+          <div class="kpi-grid">
+            <div class="kpi"><div class="kpi-val" style="color:var(--ac)">5</div><div class="kpi-lbl">Cours inscrits</div><div class="kpi-chg">↑ +1 ce mois</div></div>
+            <div class="kpi"><div class="kpi-val" style="color:var(--ac2)">44%</div><div class="kpi-lbl">Progression moy.</div><div class="kpi-chg">↑ +8% cette semaine</div></div>
+            <div class="kpi"><div class="kpi-val" style="color:var(--amber)">420</div><div class="kpi-lbl">Points XP</div><div class="kpi-chg">🔥 7 jours de streak</div></div>
+            <div class="kpi"><div class="kpi-val" style="color:var(--green)">1</div><div class="kpi-lbl">Certificat</div><div class="kpi-chg">🏅 Node.js obtenu</div></div>
+          </div>
+          <div class="g2">
+            <div class="card">
+              <div class="sh"><div><div class="sh-title">Continuer l'apprentissage</div><div class="sh-sub">Cours en cours</div></div><span class="sh-action" onclick="goPage('my-courses',document.querySelector('[onclick*=my-courses]'))">Voir tout →</span></div>
+              <div id="dash-courses"></div>
+            </div>
+            <div class="card">
+              <div class="sh"><div class="sh-title">Streak & Objectifs</div></div>
+              <div style="margin-bottom:1rem">
+                <div style="font-size:11px;color:var(--txt3);margin-bottom:6px">🔥 Streak — 7 jours consécutifs</div>
+                <div class="streak-days" id="streak-days"></div>
+              </div>
+              <div style="font-size:11px;color:var(--txt3);margin-bottom:6px">Objectif hebdomadaire</div>
+              <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
+                <span style="color:var(--txt2)">3 leçons / semaine</span>
+                <span style="color:var(--ac);font-weight:600">2/3</span>
+              </div>
+              <div class="prog-bar"><div class="prog-fill" style="width:66%"></div></div>
+              <div style="margin-top:1rem">
+                <div style="font-size:10px;color:var(--txt3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Badges débloqués</div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap">
+                  <span style="font-size:20px" title="Première connexion">🌟</span>
+                  <span style="font-size:20px" title="Premier cours terminé">🎓</span>
+                  <span style="font-size:20px" title="7 jours de streak">🔥</span>
+                  <span style="font-size:20px;opacity:.3" title="10 cours terminés (verrouillé)">🏆</span>
+                  <span style="font-size:20px;opacity:.3" title="Premier certificat (verrouillé)">🏅</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="sh"><div class="sh-title">Cours recommandés</div><span class="sh-action" onclick="goPage('catalogue',document.querySelector('[onclick*=catalogue]'))">Explorer →</span></div>
+            <div id="dash-reco"></div>
+          </div>
+        </div>
+
+        <!-- MES COURS -->
+        <div class="page" id="page-my-courses">
+          <div class="sh">
+            <div><div class="sh-title">Mes cours</div><div class="sh-sub">5 cours inscrits</div></div>
+            <button class="btn btn-ac" onclick="goPage('catalogue',document.querySelector('[onclick*=catalogue]'))">+ Découvrir des cours</button>
+          </div>
+          <div id="my-courses-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:.9rem"></div>
+        </div>
+
+        <!-- LECTEUR -->
+        <div class="page" id="page-learn">
+          <div style="display:grid;grid-template-columns:260px 1fr;gap:.9rem;height:calc(100vh - 120px)">
+            <!-- Sidebar cours -->
+            <div class="card" style="overflow-y:auto;padding:.75rem">
+              <div style="font-size:11px;font-weight:700;color:var(--txt);margin-bottom:.75rem">⚛️ React Avancé — Hooks & Patterns</div>
+              <div style="margin-bottom:.75rem">
+                <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--txt3);margin-bottom:3px">
+                  <span>Progression</span><span style="color:var(--ac);font-weight:600">44%</span>
+                </div>
+                <div class="prog-bar"><div class="prog-fill" style="width:44%"></div></div>
+              </div>
+              <div style="font-size:9px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;padding:0 2px">Section 1 — Introduction</div>
+              <div id="lesson-list"></div>
+            </div>
+            <!-- Video + infos -->
+            <div style="display:flex;flex-direction:column;gap:.75rem;overflow-y:auto">
+              <div class="video-player">
+                <div class="video-screen" id="video-screen">
+                  <div style="position:absolute;top:8px;left:12px;font-size:10px;color:rgba(255,255,255,.5)">Leçon 7 — Hooks & Context API</div>
+                  <div class="play-btn" onclick="togglePlay(this)" id="play-btn">▶</div>
+                  <div style="position:absolute;bottom:8px;right:12px;font-size:10px;color:rgba(255,255,255,.5)" id="vid-time">18:42 / 44:10</div>
+                </div>
+                <div class="video-bar">
+                  <span style="font-size:10px;color:rgba(255,255,255,.5)">18:42</span>
+                  <div class="vid-prog" onclick="seekVideo(event,this)"><div class="vid-fill" id="vid-fill"></div></div>
+                  <span style="font-size:10px;color:rgba(255,255,255,.5)">44:10</span>
+                  <span style="font-size:12px;cursor:pointer;color:rgba(255,255,255,.6)" title="Plein écran">⛶</span>
+                </div>
+              </div>
+              <div class="card">
+                <div style="display:flex;align-items:start;justify-content:space-between;margin-bottom:.75rem">
+                  <div>
+                    <div style="font-size:14px;font-weight:700;color:var(--txt)">Leçon 7 — Hooks & Context API</div>
+                    <div style="font-size:11px;color:var(--txt3);margin-top:2px">👨‍🏫 Cheikh T. Mbow · 12 leçons · 4h 20min</div>
+                  </div>
+                  <button class="btn btn-ac" onclick="markComplete()">✓ Marquer complétée</button>
+                </div>
+                <!-- Mini quiz inline -->
+                <div style="background:rgba(16,185,129,.04);border:1px solid rgba(16,185,129,.15);border-radius:9px;padding:11px">
+                  <div style="font-size:10px;font-weight:700;color:var(--ac);letter-spacing:.06em;margin-bottom:8px">QUIZ RAPIDE · 1 QUESTION</div>
+                  <div style="font-size:12px;color:var(--txt);margin-bottom:10px">Qu'est-ce que <code style="background:rgba(255,255,255,.08);padding:1px 5px;border-radius:4px;font-family:var(--mono);font-size:11px">useCallback</code> ?</div>
+                  <div id="inline-quiz-opts"></div>
+                  <div id="inline-quiz-result" style="display:none;margin-top:8px;font-size:11px;padding:7px 10px;border-radius:7px"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- QUIZ -->
+        <div class="page" id="page-quiz">
+          <div style="max-width:680px;margin:0 auto">
+            <div class="card" style="margin-bottom:.9rem">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+                <div>
+                  <div style="font-size:14px;font-weight:700;color:var(--txt)">Quiz — React Fondamentaux</div>
+                  <div style="font-size:11px;color:var(--txt3);margin-top:2px">5 questions · 30 minutes · Score min: 70%</div>
+                </div>
+                <div id="quiz-timer" style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--ac);padding:6px 12px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:8px">28:45</div>
+              </div>
+              <!-- Progress questions -->
+              <div style="display:flex;gap:4px;margin-bottom:1rem">
+                <div id="q-progress-dots"></div>
+              </div>
+              <div class="prog-bar" style="height:4px;margin-bottom:0"><div class="prog-fill" id="q-prog-fill" style="width:20%"></div></div>
+            </div>
+
+            <div class="card" id="quiz-question-card"></div>
+
+            <div style="display:flex;justify-content:space-between;margin-top:.9rem">
+              <button class="btn" id="q-prev-btn" onclick="quizPrev()" disabled>← Précédente</button>
+              <div style="font-size:11px;color:var(--txt3);line-height:2">Question <span id="q-cur">1</span> / <span id="q-total">5</span></div>
+              <button class="btn btn-ac" id="q-next-btn" onclick="quizNext()">Suivante →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- CERTIFICATS -->
+        <div class="page" id="page-certificates">
+          <div class="sh"><div><div class="sh-title">Mes Certificats</div><div class="sh-sub">1 certificat obtenu</div></div></div>
+          <div id="certs-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem"></div>
+          <div style="margin-top:1.5rem">
+            <div style="font-size:10px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem">Cours certifiants restants</div>
+            <div id="pending-certs" style="display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem"></div>
+          </div>
+        </div>
+
+        <!-- CATALOGUE -->
+        <div class="page" id="page-catalogue">
+          <div class="sh">
+            <div><div class="sh-title">Catalogue</div><div class="sh-sub">48 cours disponibles</div></div>
+            <div style="display:flex;gap:7px">
+              <input class="fi" style="width:200px;padding:7px 11px;font-size:11px" id="cat-search" placeholder="🔍 Rechercher…" oninput="filterCat()">
+              <select class="fi" style="width:130px;padding:7px 11px;font-size:11px" onchange="filterCat()">
+                <option>Tous niveaux</option><option>Débutant</option><option>Intermédiaire</option><option>Avancé</option>
+              </select>
+            </div>
+          </div>
+          <div id="cat-filter-row" style="display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap"></div>
+          <div id="catalogue-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:.9rem"></div>
+        </div>
+
+        <!-- PROGRESSION -->
+        <div class="page" id="page-progress">
+          <div class="sh"><div class="sh-title">Suivi de progression</div></div>
+          <div class="g2">
+            <div class="card">
+              <div class="sh"><div class="sh-title">Progression par cours</div></div>
+              <div id="progress-bars"></div>
+            </div>
+            <div class="card">
+              <div class="sh"><div class="sh-title">Activité récente</div></div>
+              <div id="activity-list"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="sh"><div class="sh-title">Temps d'apprentissage — 7 derniers jours</div></div>
+            <div style="display:flex;align-items:flex-end;gap:6px;height:80px;padding-top:8px" id="week-chart"></div>
+            <div style="display:flex;justify-content:space-between;margin-top:4px">
+              <span style="font-size:9px;color:var(--txt3)">Lun</span>
+              <span style="font-size:9px;color:var(--txt3)">Mar</span>
+              <span style="font-size:9px;color:var(--txt3)">Mer</span>
+              <span style="font-size:9px;color:var(--txt3)">Jeu</span>
+              <span style="font-size:9px;color:var(--txt3)">Ven</span>
+              <span style="font-size:9px;color:var(--txt3)">Sam</span>
+              <span style="font-size:9px;color:var(--txt3)">Dim</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- PROFILE -->
+        <div class="page" id="page-profile">
+          <div style="max-width:560px">
+            <div class="card" style="margin-bottom:.9rem">
+              <div style="display:flex;align-items:center;gap:14px;margin-bottom:1.25rem">
+                <div style="width:56px;height:56px;border-radius:50%;background:rgba(16,185,129,.1);border:2px solid rgba(16,185,129,.25);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:var(--ac);flex-shrink:0" id="prof-av">AM</div>
+                <div>
+                  <div style="font-size:16px;font-weight:800;color:var(--txt)" id="prof-name">Amadou Ndiaye</div>
+                  <div style="font-size:12px;color:var(--txt3)" id="prof-email">student@edusn.sn</div>
+                  <div style="display:flex;gap:6px;margin-top:5px">
+                    <span class="badge b-ac">Étudiant</span>
+                    <span class="badge b-amber">🔥 7 streak</span>
+                    <span class="badge b-purple">⭐ 420 XP</span>
+                  </div>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1rem">
+                <div><label class="fl">Prénom</label><input class="fi" value="Amadou" id="pf-fn"></div>
+                <div><label class="fl">Nom</label><input class="fi" value="Ndiaye" id="pf-ln"></div>
+              </div>
+              <div style="margin-bottom:.75rem"><label class="fl">Email</label><input class="fi" value="student@edusn.sn" id="pf-email" type="email"></div>
+              <div style="margin-bottom:.75rem"><label class="fl">Téléphone</label><input class="fi" value="+221 77 000 00 00" id="pf-phone"></div>
+              <div style="margin-bottom:1rem"><label class="fl">Bio</label><textarea class="fi" rows="2" id="pf-bio" placeholder="Parlez-nous de vous…">Étudiant en développement web. Passionné par React et Node.js.</textarea></div>
+              <button class="btn btn-ac" onclick="saveProfile()">💾 Sauvegarder le profil</button>
+            </div>
+            <div class="card">
+              <div class="sh"><div class="sh-title">Statistiques</div></div>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem">
+                <div style="text-align:center;padding:.875rem;background:var(--s3);border-radius:9px">
+                  <div style="font-size:22px;font-weight:800;color:var(--ac)">5</div>
+                  <div style="font-size:10px;color:var(--txt3)">Cours inscrits</div>
+                </div>
+                <div style="text-align:center;padding:.875rem;background:var(--s3);border-radius:9px">
+                  <div style="font-size:22px;font-weight:800;color:var(--amber)">420</div>
+                  <div style="font-size:10px;color:var(--txt3)">Points XP</div>
+                </div>
+                <div style="text-align:center;padding:.875rem;background:var(--s3);border-radius:9px">
+                  <div style="font-size:22px;font-weight:800;color:var(--green)">1</div>
+                  <div style="font-size:10px;color:var(--txt3)">Certificat</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /content -->
+    </div><!-- /main -->
+  </div><!-- /app-wrap -->
+</div><!-- /app -->
+
+<script>
+// ── DATA ──────────────────────────────────────
+const USERS = {
+  'student@edusn.sn': { pass:'Student12', name:'Amadou Ndiaye',   role:'Étudiant',    initials:'AN', xp:420 },
+  'cheikh@edusn.sn':  { pass:'Cheikh123', name:'Cheikh T. Mbow',  role:'Instructeur', initials:'CM', xp:1840 },
+  'admin@edusn.sn':   { pass:'Admin1234', name:'Admin EduSN',      role:'Admin',       initials:'AD', xp:999 },
+};
+
+const COURSES = [
+  { id:1, title:'React & Next.js 14 — De zéro à expert', icon:'⚛️', cat:'Développement Web', bg:'#0D1B2A', lvl:'Débutant',   free:false, price:'15 000 F', cert:true,  hours:12, students:1240, rating:4.8, progress:44 },
+  { id:2, title:'Flutter & Dart — Apps iOS & Android',   icon:'🐦', cat:'Mobile',             bg:'#0a0f1a', lvl:'Intermédiaire',free:false, price:'18 000 F', cert:true,  hours:15, students:890,  rating:4.9, progress:0  },
+  { id:3, title:'Python & Machine Learning',             icon:'🐍', cat:'Data Science',       bg:'#0a1020', lvl:'Débutant',   free:false, price:'20 000 F', cert:true,  hours:18, students:720,  rating:4.7, progress:12 },
+  { id:4, title:'Figma UI/UX — Design de A à Z',        icon:'🎨', cat:'Design',              bg:'#1a0a1a', lvl:'Débutant',   free:true,  price:'Gratuit',   cert:false, hours:8,  students:2100, rating:4.6, progress:100},
+  { id:5, title:'Node.js & Express — API REST',          icon:'🟩', cat:'Backend',             bg:'#0a1a0e', lvl:'Intermédiaire',free:true,  price:'Gratuit',   cert:false, hours:8,  students:1560, rating:4.8, progress:100},
+  { id:6, title:'MongoDB — Du modèle à la production',  icon:'🍃', cat:'Base de données',     bg:'#061209', lvl:'Intermédiaire',free:false, price:'12 000 F', cert:true,  hours:7,  students:145,  rating:4.5, progress:0  },
+  { id:7, title:'Firebase — Auth, Firestore & Hosting', icon:'🔥', cat:'Full-Stack',           bg:'#1a1006', lvl:'Intermédiaire',free:false, price:'14 000 F', cert:true,  hours:9,  students:165,  rating:4.7, progress:0  },
+  { id:8, title:'Docker & DevOps pour développeurs',    icon:'🐋', cat:'DevOps',               bg:'#061218', lvl:'Avancé',     free:false, price:'22 000 F', cert:true,  hours:14, students:340,  rating:4.6, progress:0  },
+];
+
+const MY_COURSES = COURSES.filter(c => [1,3,4,5].includes(c.id));
+
+const LESSONS = [
+  { id:1, title:'Bienvenue sur le cours',      done:true,  free:true,  dur:'8min'  },
+  { id:2, title:'Installation Node & VS Code', done:true,  free:true,  dur:'12min' },
+  { id:3, title:'Créer son premier projet',    done:true,  free:true,  dur:'15min' },
+  { id:4, title:'JSX et les composants',       done:true,  free:false, dur:'22min' },
+  { id:5, title:'Props et composition',        done:true,  free:false, dur:'26min' },
+  { id:6, title:'useState et les événements',  done:false, free:false, dur:'30min' },
+  { id:7, title:'useEffect en profondeur',     done:false, free:false, dur:'35min', active:true },
+  { id:8, title:'useCallback & useMemo',       done:false, free:false, dur:'40min' },
+  { id:9, title:'Custom Hooks — patterns',     done:false, free:false, dur:'33min' },
+];
+
+const QUIZ_QUESTIONS = [
+  { q:'Quel hook gère l\'état local dans un composant fonctionnel ?', opts:['useEffect','useState','useReducer','useRef'], correct:1, exp:'useState retourne [state, setState] pour l\'état local.' },
+  { q:'useEffect avec [] s\'exécute…', opts:['À chaque rendu','Jamais','Une seule fois au montage','À chaque setState'], correct:2, exp:'Un tableau vide = aucune dépendance = exécution uniquement au montage.' },
+  { q:'Next.js 14 utilise le App Router par défaut.', opts:['Vrai','Faux'], correct:0, exp:'Depuis Next.js 13, le App Router remplace le Pages Router.' },
+  { q:'useCallback mémorise…', opts:['Une valeur calculée','La référence d\'une fonction','Le state du composant','Un effet secondaire'], correct:1, exp:'useCallback mémorise la référence d\'une fonction, useMemo mémorise une valeur.' },
+  { q:'SSR signifie…', opts:['Static Site Rendering','Server-Side Rendering','Scoped Style React','Simple State Redux'], correct:1, exp:'SSR = Server-Side Rendering — HTML généré côté serveur à chaque requête.' },
+];
+
+const CATS = ['Tous','Développement Web','Mobile','Data Science','Design','Backend','Full-Stack','DevOps'];
+
+let currentUser = null;
+let quizCurrent = 0;
+let quizAnswers = {};
+let quizSubmitted = false;
+let quizTimer = null;
+let quizSecs = 28 * 60 + 45;
+let isPlaying = false;
+let vidProgress = 42;
+let vidInterval = null;
+
+// ── AUTH ──────────────────────────────────────
+function fillDemo(email, pass) {
+  document.getElementById('li-email').value = email;
+  document.getElementById('li-pass').value  = pass;
+}
+
+function doLogin() {
+  const email = document.getElementById('li-email').value.trim().toLowerCase();
+  const pass  = document.getElementById('li-pass').value;
+  const u     = USERS[email];
+  if (!u || u.pass !== pass) {
+    ['li-email','li-pass'].forEach(id => {
+      const el = document.getElementById(id);
+      el.style.borderColor = 'var(--red)';
+      setTimeout(() => el.style.borderColor = '', 1400);
+    });
+    return;
+  }
+  currentUser = { email, ...u };
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').classList.add('active');
+
+  ['sf-av','tu-av','prof-av'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = u.initials;
+  });
+  document.getElementById('sf-name').textContent = u.name.split(' ')[0];
+  document.getElementById('sf-role').textContent = u.role;
+  document.getElementById('tu-name').textContent = u.name;
+  document.getElementById('xp-val').textContent  = u.xp;
+  document.getElementById('page-date').textContent =
+    new Date().toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' });
+
+  const pn = document.getElementById('prof-name'); if (pn) pn.textContent = u.name;
+  const pe = document.getElementById('prof-email'); if (pe) pe.textContent = email;
+
+  initAll();
+  showToast(`Bienvenue, ${u.name.split(' ')[0]} ! 👋`, 'EduSN chargé avec succès');
+}
+
+function doLogout() {
+  currentUser = null;
+  if (vidInterval) clearInterval(vidInterval);
+  if (quizTimer)  clearInterval(quizTimer);
+  document.getElementById('app').classList.remove('active');
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('li-email').value = '';
+  document.getElementById('li-pass').value  = '';
+  quizCurrent = 0; quizAnswers = {}; quizSubmitted = false; isPlaying = false; vidProgress = 42;
+  document.querySelectorAll('.page').forEach((p,i) => p.classList.toggle('active', i===0));
+  document.querySelectorAll('.nav-item').forEach((n,i) => n.classList.toggle('active', i===0));
+  document.getElementById('page-title').textContent = 'Accueil';
+}
+
+// ── NAVIGATION ────────────────────────────────
+const PAGE_TITLES = {
+  'dashboard':'Accueil','my-courses':'Mes cours','learn':'Lecteur de cours',
+  'quiz':'Quiz interactif','certificates':'Mes certificats',
+  'catalogue':'Catalogue','progress':'Progression','profile':'Mon profil'
+};
+
+function goPage(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (el) el.classList.add('active');
+  document.getElementById('page-title').textContent = PAGE_TITLES[id] || id;
+  if (id === 'quiz') startQuizTimer();
+  else { if (quizTimer) clearInterval(quizTimer); }
+}
+
+// ── INIT ──────────────────────────────────────
+function initAll() {
+  initDashboard();
+  initMyCourses();
+  initLearn();
+  initQuiz();
+  initCertificates();
+  initCatalogue();
+  initProgress();
+}
+
+// DASHBOARD
+function initDashboard() {
+  const streakEl = document.getElementById('streak-days');
+  const days = ['L','M','M','J','V','S','D'];
+  streakEl.innerHTML = days.map((d,i) => `
+    <div class="streak-day" style="background:${i<7?'rgba(16,185,129,.2)':'var(--s3)'};color:${i<7?'var(--ac)':'var(--txt3)'}">
+      ${d}
+    </div>`).join('');
+
+  const dc = document.getElementById('dash-courses');
+  dc.innerHTML = MY_COURSES.filter(c=>c.progress>0&&c.progress<100).map(c=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd)">
+      <div style="width:32px;height:32px;border-radius:8px;background:${c.bg};display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${c.icon}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:600;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.title}</div>
+        <div style="font-size:10px;color:var(--txt3);margin-top:1px">${c.progress}% complété · ${c.hours}h</div>
+        <div class="prog-bar"><div class="prog-fill" style="width:${c.progress}%"></div></div>
+      </div>
+      <button class="btn btn-ac" style="padding:4px 10px;font-size:10px" onclick="goPage('learn',document.querySelector('[onclick*=learn]'))">▶</button>
+    </div>`).join('');
+
+  const reco = document.getElementById('dash-reco');
+  reco.innerHTML = `<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.7rem">
+    ${COURSES.filter(c=>c.progress===0).slice(0,4).map(c=>`
+      <div class="card-hover" onclick="openCourse(${c.id})" style="padding:.875rem">
+        <div style="font-size:28px;margin-bottom:7px">${c.icon}</div>
+        <div style="font-size:11px;font-weight:700;color:var(--txt);line-height:1.35;margin-bottom:4px">${c.title}</div>
+        <div style="font-size:10px;color:var(--txt3);margin-bottom:5px">${c.hours}h · ${c.lvl}</div>
+        <div style="font-size:11px;font-weight:700;color:${c.free?'var(--ac)':'var(--txt)'}">${c.free?'Gratuit':c.price}</div>
+      </div>`).join('')}
+  </div>`;
+}
+
+// MY COURSES
+function initMyCourses() {
+  const g = document.getElementById('my-courses-grid');
+  g.innerHTML = [...MY_COURSES, ...COURSES.filter(c=>[2,6].includes(c.id))].map(c=>`
+    <div class="course-card" onclick="goPage('learn',document.querySelector('[onclick*=learn]'))">
+      <div class="course-thumb" style="background:${c.bg}">
+        ${c.icon}
+        ${c.free ? '<span class="course-badge free-badge">Gratuit</span>' : ''}
+        ${c.cert ? '<span class="course-badge cert-badge">🏅 Certifiant</span>' : ''}
+      </div>
+      <div class="course-body">
+        <div style="font-size:10px;color:var(--txt3);margin-bottom:3px">${c.cat}</div>
+        <div class="course-title">${c.title}</div>
+        <div class="course-meta">
+          <span>⏱ ${c.hours}h</span><span>👥 ${c.students.toLocaleString()}</span><span>★ ${c.rating}</span>
+        </div>
+        ${c.progress > 0 ? `
+          <div style="margin-top:8px">
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--txt3);margin-bottom:3px">
+              <span>${c.progress === 100 ? '✅ Terminé' : `${c.progress}% complété`}</span>
+            </div>
+            <div class="prog-bar"><div class="prog-fill" style="width:${c.progress}%"></div></div>
+          </div>` : `<div style="margin-top:8px;font-size:10px;color:var(--txt3)">Non commencé</div>`}
+      </div>
+    </div>`).join('');
+}
+
+// LEARN PAGE
+function initLearn() {
+  const ll = document.getElementById('lesson-list');
+  ll.innerHTML = LESSONS.map(l=>`
+    <div class="lesson-item ${l.done?'done':''} ${l.active?'active':''}" onclick="selectLesson(${l.id})">
+      <div class="lesson-dot" style="background:${l.done?'rgba(16,185,129,.15)':l.active?'rgba(16,185,129,.1)':'transparent'};border-color:${l.done?'var(--ac)':l.active?'var(--ac)':'var(--bd2)'};color:${l.done?'var(--ac)':l.active?'var(--ac)':'var(--txt3)'}">
+        ${l.done ? '✓' : l.active ? '▶' : '·'}
+      </div>
+      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.title}</span>
+      <span style="font-size:9px;color:var(--txt3);flex-shrink:0">${l.dur}</span>
+    </div>`).join('');
+
+  // Mini quiz
+  const opts = ['Un hook de cycle de vie','✓ Mémoïsation de fonction','Un hook d\'état local'];
+  document.getElementById('inline-quiz-opts').innerHTML = opts.map((o,i)=>`
+    <div class="quiz-opt" onclick="answerInlineQuiz(${i},this)">
+      <div class="opt-letter" style="width:18px;height:18px;font-size:9px">${String.fromCharCode(65+i)}</div>
+    </div>`).join('');
+}
+
+function selectLesson(id) {
+  document.querySelectorAll('.lesson-item').forEach((el,i) => {
+    el.classList.toggle('active', LESSONS[i]?.id === id);
+  });
+  if (isPlaying) { isPlaying = false; clearInterval(vidInterval); document.getElementById('play-btn').textContent = '▶'; }
+  vidProgress = id * 8;
+  document.getElementById('vid-fill').style.width = Math.min(vidProgress,100) + '%';
+  showToast(`📽 Leçon ${id}`, LESSONS.find(l=>l.id===id)?.title || '');
+}
+
+function answerInlineQuiz(idx, el) {
+  document.querySelectorAll('#inline-quiz-opts .quiz-opt').forEach(o => {
+    o.classList.remove('selected','correct','wrong');
+  });
+  const correct = idx === 1;
+  el.classList.add(correct ? 'correct' : 'wrong');
+  const result = document.getElementById('inline-quiz-result');
+  result.style.display = 'block';
+  result.style.background = correct ? 'rgba(16,185,129,.08)' : 'rgba(239,68,68,.08)';
+  result.style.border = `1px solid ${correct ? 'rgba(16,185,129,.2)' : 'rgba(239,68,68,.2)'}`;
+  result.style.color = correct ? 'var(--ac)' : 'var(--red)';
+  result.textContent = correct
+    ? '✓ Correct ! useCallback mémorise la référence d\'une fonction entre les rendus.'
+    : '✗ Incorrect. useCallback mémorise la référence d\'une fonction (pas useMemo).';
+  if (correct) showToast('🎉 Bonne réponse !', '+10 XP gagnés');
+}
+
+function togglePlay(btn) {
+  isPlaying = !isPlaying;
+  btn.textContent = isPlaying ? '⏸' : '▶';
+  if (isPlaying) {
+    vidInterval = setInterval(() => {
+      vidProgress = Math.min(vidProgress + 0.3, 100);
+      document.getElementById('vid-fill').style.width = vidProgress + '%';
+      const mins = Math.floor(vidProgress * 44.17 / 100);
+      const secs = Math.floor((vidProgress * 44.17 / 100 - mins) * 60);
+      document.getElementById('vid-time').textContent = `${mins}:${String(secs).padStart(2,'0')} / 44:10`;
+      if (vidProgress >= 100) { clearInterval(vidInterval); isPlaying = false; btn.textContent = '▶'; showToast('✅ Leçon terminée !', 'Progression mise à jour'); }
+    }, 200);
+  } else clearInterval(vidInterval);
+}
+
+function seekVideo(e, el) {
+  const rect = el.getBoundingClientRect();
+  vidProgress = ((e.clientX - rect.left) / rect.width) * 100;
+  document.getElementById('vid-fill').style.width = vidProgress + '%';
+}
+
+function markComplete() {
+  showToast('✅ Leçon complétée !', 'Progression : 58% · +15 XP');
+}
+
+// QUIZ
+function initQuiz() {
+  renderQuizQuestion();
+}
+
+function renderQuizQuestion() {
+  var q = QUIZ_QUESTIONS[quizCurrent];
+  var card = document.getElementById('quiz-question-card');
+  var selected = quizAnswers[quizCurrent];
+
+  var optsHtml = '';
+  for (var i = 0; i < q.opts.length; i++) {
+    var o = q.opts[i];
+    var cls = '';
+    if (quizSubmitted) {
+      cls = i===q.correct ? 'correct' : (selected===i && i!==q.correct) ? 'wrong' : '';
+    } else if (selected===i) { cls = 'selected'; }
+    var clickFn = quizSubmitted ? '' : ('selectQuizOpt(' + i + ')');
+    var checkMark = (quizSubmitted && i===q.correct) ? '<span style="margin-left:auto;font-size:11px">\u2713</span>' : '';
+    optsHtml += '<div class="quiz-opt ' + cls + '" onclick="' + clickFn + '">' +
+      '<div class="opt-letter">' + String.fromCharCode(65+i) + '</div>' +
+      '<span>' + o + '</span>' + checkMark + '</div>';
+  }
+
+  var expHtml = '';
+  if (quizSubmitted && q.exp) {
+    expHtml = '<div style="margin-top:.75rem;padding:9px 11px;background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.15);border-radius:8px;font-size:11px;color:var(--txt2)">\ud83d\udca1 ' + q.exp + '</div>';
+  }
+
+  card.innerHTML =
+    '<div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem">' +
+    '<span class="badge b-ac" style="font-size:9px">QCM</span>' +
+    '<span style="font-size:10px;color:var(--txt3)">Question ' + (quizCurrent+1) + ' / ' + QUIZ_QUESTIONS.length + '</span>' +
+    '<span style="margin-left:auto;font-size:10px;color:var(--txt3)">2 points</span></div>' +
+    '<div style="font-size:14px;font-weight:600;color:var(--txt);margin-bottom:1.1rem;line-height:1.5">' + q.q + '</div>' +
+    '<div id="quiz-opts-wrap">' + optsHtml + '</div>' + expHtml;
+
+  // Progress dots
+  document.getElementById('q-progress-dots').innerHTML =
+    QUIZ_QUESTIONS.map((_,i)=>`<div style="flex:1;height:4px;border-radius:2px;background:${i===quizCurrent?'var(--ac)':quizAnswers[i]!==undefined?'rgba(16,185,129,.3)':'var(--bd)'}"></div>`).join('');
+  document.getElementById('q-prog-fill').style.width = `${((quizCurrent+1)/QUIZ_QUESTIONS.length)*100}%`;
+  document.getElementById('q-cur').textContent = quizCurrent+1;
+  document.getElementById('q-total').textContent = QUIZ_QUESTIONS.length;
+  const prevBtn = document.getElementById('q-prev-btn');
+  const nextBtn = document.getElementById('q-next-btn');
+  prevBtn.disabled = quizCurrent===0;
+  const isLast = quizCurrent===QUIZ_QUESTIONS.length-1;
+  nextBtn.textContent = isLast ? 'Soumettre ✓' : 'Suivante →';
+  nextBtn.className   = isLast ? 'btn' : 'btn btn-ac';
+}
+
+function selectQuizOpt(i) {
+  if (quizSubmitted) return;
+  quizAnswers[quizCurrent] = i;
+  renderQuizQuestion();
+}
+
+function quizNext() {
+  if (quizCurrent === QUIZ_QUESTIONS.length-1) submitQuiz();
+  else { quizCurrent++; renderQuizQuestion(); }
+}
+
+function quizPrev() {
+  if (quizCurrent > 0) { quizCurrent--; renderQuizQuestion(); }
+}
+
+function submitQuiz() {
+  quizSubmitted = true;
+  if (quizTimer) clearInterval(quizTimer);
+  const score = QUIZ_QUESTIONS.reduce((s,q,i) => s + (quizAnswers[i]===q.correct?1:0), 0);
+  const pct   = Math.round((score/QUIZ_QUESTIONS.length)*100);
+  const passed = pct >= 70;
+  renderQuizQuestion();
+  showToast(
+    passed ? `🎉 Quiz réussi ! ${pct}%` : `❌ Score insuffisant ${pct}%`,
+    passed ? `${score}/${QUIZ_QUESTIONS.length} correctes · +${score*10} XP` : 'Minimum requis : 70%. Réessayez !'
+  );
+}
+
+function startQuizTimer() {
+  if (quizTimer) clearInterval(quizTimer);
+  if (quizSubmitted) return;
+  quizTimer = setInterval(() => {
+    quizSecs = Math.max(0, quizSecs-1);
+    const m = Math.floor(quizSecs/60), s = quizSecs%60;
+    const el = document.getElementById('quiz-timer');
+    if (el) {
+      el.textContent = `${m}:${String(s).padStart(2,'0')}`;
+      el.style.color = quizSecs<60?'var(--red)':quizSecs<120?'var(--amber)':'var(--ac)';
+    }
+    if (quizSecs===0) { clearInterval(quizTimer); submitQuiz(); }
+  }, 1000);
+}
+
+// CERTIFICATES
+function initCertificates() {
+  const g = document.getElementById('certs-grid');
+  g.innerHTML = `
+    <div class="cert-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+        <div style="display:flex;align-items:center;gap:7px"><span style="font-size:18px">🎓</span><div style="font-size:10px;font-weight:700;color:var(--ac);letter-spacing:.1em">EDUSN</div></div>
+        <span class="badge b-ac" style="font-size:9px">✓ Vérifié</span>
+      </div>
+      <div style="height:1px;background:linear-gradient(90deg,rgba(16,185,129,.3),transparent);margin-bottom:1rem"></div>
+      <div style="text-align:center;margin-bottom:1rem">
+        <div style="font-size:10px;color:var(--txt3);margin-bottom:3px">Décerné à</div>
+        <div style="font-size:16px;font-weight:800;color:var(--txt);margin-bottom:3px">${currentUser?.name || 'Amadou Ndiaye'}</div>
+        <div style="font-size:10px;color:var(--txt3);margin-bottom:8px">pour avoir complété</div>
+        <div style="font-size:12px;font-weight:700;color:var(--ac)">Node.js & Express — API REST</div>
+        <div style="font-size:10px;color:var(--txt3);margin-top:2px">8h · Intermédiaire</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--txt3);margin-bottom:1rem">
+        <div><div style="font-family:var(--mono);color:var(--txt2)">EDUSN-2025-000001</div><div>14 Jan 2025</div></div>
+        <div style="text-align:right"><div>Instructeur</div><div style="color:var(--txt2)">Cheikh T. Mbow</div></div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-ac" style="flex:1;font-size:10px;padding:5px" onclick="downloadCert()">📄 PDF</button>
+        <button class="btn" style="font-size:10px;padding:5px" onclick="copyCertLink()">🔗</button>
+        <button class="btn" style="font-size:10px;padding:5px" onclick="verifyCert()">👁</button>
+      </div>
+    </div>`;
+
+  document.getElementById('pending-certs').innerHTML = COURSES.filter(c=>c.cert&&c.progress<100&&[1,3].includes(c.id)).map(c=>`
+    <div class="card-hover" style="padding:.875rem" onclick="goPage('learn',document.querySelector('[onclick*=learn]'))">
+      <div style="font-size:24px;margin-bottom:6px">${c.icon}</div>
+      <div style="font-size:11px;font-weight:700;color:var(--txt);margin-bottom:4px;line-height:1.3">${c.title}</div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${c.progress}%"></div></div>
+      <div style="font-size:10px;color:var(--txt3);margin-top:4px">${c.progress}% · ${c.hours}h restantes</div>
+    </div>`).join('');
+}
+
+function downloadCert() { showToast('📄 Téléchargement PDF','Certificat généré via PDFKit · Stocké sur AWS S3'); }
+function copyCertLink() {
+  showToast('🔗 Lien copié !','edusn.sn/verify/EDUSN-2025-000001');
+}
+function verifyCert() { openModal('✅ Vérification du certificat',`
+  <div style="text-align:center;padding:.5rem">
+    <div style="font-size:48px;margin-bottom:.75rem">✅</div>
+    <div style="font-size:15px;font-weight:700;color:var(--ac);margin-bottom:.5rem">Certificat Authentique</div>
+    <div style="font-size:12px;color:var(--txt2);margin-bottom:1.25rem">Vérifié par EduSN</div>
+    <div style="text-align:left;display:flex;flex-direction:column;gap:9px">
+      ${[['Étudiant','Amadou Ndiaye'],['Cours','Node.js & Express — API REST'],['N° Certificat','EDUSN-2025-000001'],['Date','14 Janvier 2025'],['Statut','✅ Valide']].map(([l,v])=>`
+        <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bd)">
+          <span style="font-size:11px;color:var(--txt3)">${l}</span>
+          <span style="font-size:11px;font-weight:600;color:var(--txt)">${v}</span>
+        </div>`).join('')}
+    </div>
+  </div>`,[]);
+}
+
+// CATALOGUE
+function initCatalogue() {
+  document.getElementById('cat-filter-row').innerHTML = CATS.map((c,i)=>`
+    <button class="btn ${i===0?'btn-ac':''}" style="font-size:10px;padding:4px 11px" onclick="setCatFilter('${c}',this)">${c}</button>`).join('');
+  renderCatalogue(COURSES);
+}
+
+function setCatFilter(cat, el) {
+  document.querySelectorAll('#cat-filter-row button').forEach(b => b.classList.remove('btn-ac'));
+  el.classList.add('btn-ac');
+  renderCatalogue(cat==='Tous' ? COURSES : COURSES.filter(c=>c.cat===cat));
+}
+
+function filterCat() {
+  const q = document.getElementById('cat-search').value.toLowerCase();
+  renderCatalogue(q ? COURSES.filter(c=>c.title.toLowerCase().includes(q)||c.cat.toLowerCase().includes(q)) : COURSES);
+}
+
+function renderCatalogue(list) {
+  document.getElementById('catalogue-grid').innerHTML = list.map(c=>`
+    <div class="course-card" onclick="openCourse(${c.id})">
+      <div class="course-thumb" style="background:${c.bg}">
+        ${c.icon}
+        ${c.free ? '<span class="course-badge free-badge">Gratuit</span>' : ''}
+        ${c.cert ? '<span class="course-badge cert-badge">🏅</span>' : ''}
+      </div>
+      <div class="course-body">
+        <div style="display:flex;gap:4px;margin-bottom:4px">
+          <span class="badge ${c.lvl==='Débutant'?'b-green':c.lvl==='Intermédiaire'?'b-blue':'b-purple'}" style="font-size:9px">${c.lvl}</span>
+          <span style="font-size:9px;color:var(--txt3)">${c.cat}</span>
+        </div>
+        <div class="course-title">${c.title}</div>
+        <div class="course-meta"><span>⏱ ${c.hours}h</span><span>👥 ${c.students.toLocaleString()}</span><span>★ ${c.rating}</span></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:7px">
+          <span style="font-size:12px;font-weight:700;color:${c.free?'var(--ac)':'var(--txt)'}">${c.free?'Gratuit':c.price}</span>
+          <button class="btn btn-ac" style="font-size:9px;padding:3px 9px" onclick="event.stopPropagation();enrollCourse(${c.id})">S'inscrire</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function openCourse(id) {
+  const c = COURSES.find(x=>x.id===id);
+  if (!c) return;
+  openModal(`${c.icon} ${c.title}`,`
+    <div style="display:flex;gap:12px;margin-bottom:1rem;align-items:start">
+      <div style="flex:1">
+        <div style="font-size:10px;color:var(--txt3);margin-bottom:4px">${c.cat} · ${c.lvl}</div>
+        <p style="font-size:12px;color:var(--txt2);line-height:1.6;margin-bottom:.75rem">Cours complet — de la théorie à la pratique. Exemples concrets, projets réels et quiz à chaque leçon.</p>
+        <div style="display:flex;gap:12px;font-size:11px;color:var(--txt3)">
+          <span>⏱ ${c.hours}h</span><span>👥 ${c.students.toLocaleString()} inscrits</span><span>★ ${c.rating}</span>
+        </div>
+        <div style="margin-top:.875rem">
+          ${['Vidéos HD streamées via CloudFront','Quiz interactifs à chaque leçon','Projets pratiques à rendre','Accès illimité à vie', c.cert?'🏅 Certificat PDF vérifiable':''].filter(Boolean).map(f=>`
+            <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--txt2);margin-bottom:4px">
+              <span style="color:var(--ac)">✓</span>${f}
+            </div>`).join('')}
+        </div>
+      </div>
+      <div style="text-align:center;flex-shrink:0">
+        <div style="font-size:28px;margin-bottom:6px">${c.icon}</div>
+        <div style="font-size:18px;font-weight:800;color:${c.free?'var(--ac)':'var(--txt)'}">${c.free?'Gratuit':c.price}</div>
+      </div>
+    </div>`,
+    [{label:`🎓 S'inscrire${c.free?'':' · '+c.price}`, cls:'btn-ac', fn:`enrollCourse(${c.id});closeModal()`}]);
+}
+
+function enrollCourse(id) {
+  const c = COURSES.find(x=>x.id===id);
+  if (c) showToast('🎉 Inscription réussie !', `Vous êtes inscrit à "${c.title.substring(0,35)}…"`);
+}
+
+// PROGRESS
+function initProgress() {
+  document.getElementById('progress-bars').innerHTML = MY_COURSES.map(c=>`
+    <div style="margin-bottom:.875rem">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+        <span style="font-size:16px">${c.icon}</span>
+        <span style="font-size:12px;color:var(--txt);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.title}</span>
+        <span style="font-size:11px;font-weight:700;color:var(--ac)">${c.progress}%</span>
+      </div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${c.progress}%"></div></div>
+    </div>`).join('');
+
+  document.getElementById('activity-list').innerHTML = [
+    { ico:'🎬', txt:'Leçon 7 complétée — React Avancé',  time:'Il y a 2h',   xp:'+15 XP' },
+    { ico:'🧪', txt:'Quiz React réussi — score 80%',    time:'Il y a 5h',   xp:'+30 XP' },
+    { ico:'🏅', txt:'Certificat Node.js obtenu !',       time:'Hier',        xp:'+100 XP'},
+    { ico:'📚', txt:'Inscription Python & ML',           time:'Il y a 3j',  xp: '+5 XP' },
+    { ico:'🔥', txt:'Streak 7 jours atteint !',          time:'Il y a 3j',  xp:'+50 XP' },
+  ].map(a=>`
+    <div style="display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--bd)">
+      <span style="font-size:16px;flex-shrink:0">${a.ico}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:11px;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.txt}</div>
+        <div style="font-size:10px;color:var(--txt3)">${a.time}</div>
+      </div>
+      <span style="font-size:10px;font-weight:700;color:var(--amber);flex-shrink:0">${a.xp}</span>
+    </div>`).join('');
+
+  const vals=[20,45,30,60,40,75,25], max=Math.max(...vals);
+  document.getElementById('week-chart').innerHTML = vals.map((v,i)=>`
+    <div style="flex:1;display:flex;align-items:flex-end">
+      <div style="width:100%;height:${Math.max(8,(v/max)*70)}px;background:linear-gradient(to top,var(--ac),var(--ac2));border-radius:3px 3px 0 0;opacity:${i===5?1:.7}" title="${v} min"></div>
+    </div>`).join('');
+}
+
+// MODAL & TOAST
+function openModal(title, body, actions=[]) {
+  document.getElementById('modal-box').innerHTML = `
+    <div class="modal-hd">
+      <div class="modal-title">${title}</div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">${body}</div>
+    ${actions.length?`<div class="modal-ft">
+      <button class="btn" onclick="closeModal()">Fermer</button>
+      ${actions.map(a=>`<button class="btn ${a.cls}" onclick="${a.fn}">${a.label}</button>`).join('')}
+    </div>`:''}`;
+  document.getElementById('modal-ov').classList.add('open');
+}
+function closeModal() { document.getElementById('modal-ov').classList.remove('open'); }
+
+let toastT;
+function showToast(title, msg, type='success') {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-title').textContent = title;
+  document.getElementById('toast-msg').textContent   = msg;
+  t.style.borderLeftColor = type==='error'?'var(--red)':type==='warn'?'var(--amber)':'var(--ac)';
+  t.classList.add('show');
+  clearTimeout(toastT);
+  toastT = setTimeout(()=>t.classList.remove('show'), 3500);
+}
+
+function openNotifs() {
+  openModal('🔔 Notifications',[
+    {ico:'🎬',txt:'Nouvelle leçon disponible — Flutter',time:'Il y a 30 min',c:'var(--ac)'},
+    {ico:'🧪',txt:'Rappel : Quiz React non complété',  time:'Il y a 2h',   c:'var(--amber)'},
+    {ico:'🏅',txt:'Objectif hebdo atteint — 2/3 leçons',time:'Hier',        c:'var(--green)'},
+  ].map(n=>`
+    <div style="display:flex;gap:9px;padding:10px;background:var(--s3);border-radius:8px;border-left:3px solid ${n.c};margin-bottom:6px">
+      <span style="font-size:18px">${n.ico}</span>
+      <div><div style="font-size:12px;font-weight:600;color:var(--txt)">${n.txt}</div>
+      <div style="font-size:10px;color:var(--txt3);margin-top:2px">${n.time}</div></div>
+    </div>`).join(''),[]);
+}
+
+function saveProfile() {
+  const fn = document.getElementById('pf-fn')?.value;
+  const ln = document.getElementById('pf-ln')?.value;
+  if (fn&&ln) {
+    document.getElementById('sf-name').textContent = fn;
+    document.getElementById('tu-name').textContent = fn+' '+ln;
+    document.getElementById('prof-name').textContent = fn+' '+ln;
+    document.getElementById('sf-av').textContent = fn[0]+(ln[0]||'');
+    document.getElementById('tu-av').textContent  = fn[0]+(ln[0]||'');
+    document.getElementById('prof-av').textContent = fn[0]+(ln[0]||'');
+  }
+  showToast('✅ Profil sauvegardé', 'Firebase Auth mis à jour');
+}
+
+// Init date
+document.getElementById('page-date').textContent =
+  new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+</script>
+</body>
+</html>

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DakarGo — Cheikh Tidiane Mbow</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0A0A0F;--surface:#111118;--border:#1E1E2E;--accent:#22D3EE;--accent2:#0EA5E9;--text:#E2E8F0;--muted:#4A5568;--mono:'JetBrains Mono',monospace;--sans:'Syne',sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--mono);background:var(--bg);color:var(--text);overflow-x:hidden;cursor:none}
+.cursor{width:10px;height:10px;background:var(--accent);border-radius:50%;position:fixed;z-index:99999;pointer-events:none;mix-blend-mode:difference;transition:transform .1s}
+.cursor-ring{width:34px;height:34px;border:1.5px solid var(--accent);border-radius:50%;position:fixed;z-index:99998;pointer-events:none;transition:all .15s;mix-blend-mode:difference}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--accent);border-radius:3px}
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:1.25rem 3rem;display:flex;align-items:center;justify-content:space-between;background:rgba(10,10,15,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.nav-logo{font-family:var(--mono);font-size:13px;color:var(--accent);text-decoration:none}
+.nav-logo span{color:var(--muted)}
+.nav-back{font-size:12px;color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:8px;transition:color .2s}
+.nav-back:hover{color:var(--accent)}
+
+.proj-hero{padding:8rem 3rem 5rem;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;position:relative;overflow:hidden;min-height:100vh}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 75% 50%,rgba(34,211,238,.09),transparent),radial-gradient(ellipse 40% 40% at 5% 80%,rgba(14,165,233,.06),transparent)}
+.proj-tag-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:2rem}
+.proj-tag{font-size:10px;padding:4px 12px;border:1px solid;letter-spacing:.1em}
+.tag-mobile{border-color:rgba(34,211,238,.3);color:var(--accent);background:rgba(34,211,238,.06)}
+.tag-status{border-color:rgba(34,197,94,.3);color:#4ADE80;background:rgba(34,197,94,.06)}
+.tag-year{border-color:var(--border);color:var(--muted)}
+.proj-number{font-size:11px;color:var(--muted);letter-spacing:.1em;margin-bottom:.75rem}
+.proj-title{font-family:var(--sans);font-size:clamp(40px,6vw,72px);font-weight:800;line-height:1;letter-spacing:-.03em;margin-bottom:.5rem}
+.proj-title em{color:var(--accent);font-style:normal}
+.proj-subtitle{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:2.5rem;max-width:460px}
+.proj-stats-row{display:flex;gap:2rem;margin-bottom:2.5rem}
+.pstat-n{font-family:var(--sans);font-size:28px;font-weight:800;color:var(--accent)}
+.pstat-l{font-size:10px;color:var(--muted);letter-spacing:.08em;margin-top:2px}
+.cta-row{display:flex;gap:12px;flex-wrap:wrap}
+.btn-p{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#0A0A0F;padding:11px 22px;font-family:var(--mono);font-size:12px;font-weight:700;border:none;cursor:none;text-decoration:none;transition:all .2s;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%)}
+.btn-p:hover{opacity:.85;transform:translateY(-2px)}
+.btn-o{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border);color:var(--muted);padding:11px 22px;font-family:var(--mono);font-size:12px;text-decoration:none;transition:all .2s}
+.btn-o:hover{border-color:var(--accent);color:var(--accent)}
+
+/* MAP MOCKUP */
+.map-wrap{position:relative;z-index:1;display:flex;justify-content:center}
+.phone-frame{width:240px;background:#1a1a26;border-radius:36px;border:2px solid #2a2a3e;overflow:hidden;box-shadow:0 40px 120px rgba(0,0,0,.7);margin:0 auto}
+.phone-screen{background:#0a0f1a;display:flex;flex-direction:column;height:480px}
+.phone-top-bar{padding:.6rem 1rem;display:flex;align-items:center;justify-content:space-between;background:#061020}
+.app-name-t{font-size:10px;font-weight:700;color:var(--accent)}
+.notch{width:60px;height:18px;background:#1a1a26;border-radius:0 0 12px 12px;position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:10}
+.map-area{flex:1;background:linear-gradient(135deg,#0a1628 0%,#061224 100%);position:relative;overflow:hidden}
+/* Fake map grid */
+.map-area::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(34,211,238,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(34,211,238,.04) 1px,transparent 1px);background-size:20px 20px}
+/* Fake roads */
+.road{position:absolute;background:rgba(255,255,255,.08)}
+.road-h{height:2px}
+.road-v{width:2px}
+.bus-marker{position:absolute;width:24px;height:24px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;box-shadow:0 0 12px rgba(34,211,238,.6);animation:pulse-bus 2s ease-in-out infinite}
+@keyframes pulse-bus{0%,100%{box-shadow:0 0 12px rgba(34,211,238,.6)}50%{box-shadow:0 0 24px rgba(34,211,238,.9)}}
+.route-line{position:absolute;height:3px;background:linear-gradient(90deg,var(--accent),rgba(34,211,238,.3));border-radius:2px}
+.stop-dot{position:absolute;width:8px;height:8px;border-radius:50%;background:#fff;border:2px solid var(--accent)}
+.map-card{position:absolute;bottom:.75rem;left:.75rem;right:.75rem;background:rgba(6,18,36,.95);border:1px solid rgba(34,211,238,.2);border-radius:12px;padding:.75rem;backdrop-filter:blur(8px)}
+.bus-info-row{display:flex;align-items:center;gap:8px;margin-bottom:.4rem}
+.bus-num{background:var(--accent);color:#0A0A0F;padding:2px 8px;border-radius:4px;font-size:9px;font-weight:700}
+.bus-dest{font-size:9px;color:#fff;font-weight:600}
+.bus-eta{font-size:9px;color:var(--accent);margin-left:auto}
+.stops-mini{display:flex;align-items:center;gap:3px;overflow:hidden}
+.stop-mini{width:6px;height:6px;border-radius:50%;background:rgba(34,211,238,.3);flex-shrink:0}
+.stop-mini.passed{background:var(--accent)}
+.stop-mini.current{background:#fff;box-shadow:0 0 8px rgba(255,255,255,.8)}
+
+.bottom-panel{background:#061020;padding:.6rem .75rem;border-top:1px solid rgba(34,211,238,.1);display:flex;justify-content:space-around}
+.nav-bot{font-size:13px;opacity:.4}
+.nav-bot.active{opacity:1}
+
+.float-badge-map{position:absolute;top:80px;right:-5px;background:var(--accent);color:#0A0A0F;border-radius:8px;padding:7px 10px;font-size:9px;font-weight:700;box-shadow:0 8px 24px rgba(34,211,238,.4);animation:float 3s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+
+.section{padding:6rem 3rem;border-top:1px solid var(--border)}
+.section-label{font-size:10px;color:var(--accent);letter-spacing:.2em;text-transform:uppercase;margin-bottom:.75rem}
+.section-title{font-family:var(--sans);font-size:clamp(28px,3vw,40px);font-weight:800;letter-spacing:-.02em;margin-bottom:3rem}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border)}
+.feat-card{background:var(--surface);padding:2rem;transition:background .2s}
+.feat-card:hover{background:#13131F}
+.feat-icon{font-size:28px;margin-bottom:1rem;display:block}
+.feat-title{font-family:var(--sans);font-size:16px;font-weight:700;color:var(--text);margin-bottom:.6rem}
+.feat-desc{font-size:12px;color:var(--muted);line-height:1.7}
+.tech-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.tech-item{background:var(--surface);border:1px solid var(--border);padding:1.25rem;display:flex;align-items:center;gap:12px;transition:border-color .2s}
+.tech-item:hover{border-color:var(--accent)}
+.tech-ico{font-size:24px;flex-shrink:0}
+.tech-info-name{font-size:13px;font-weight:600;color:var(--text)}
+.tech-info-role{font-size:11px;color:var(--muted);margin-top:2px}
+.lignes-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+.ligne-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1.25rem;text-align:center;transition:all .2s;cursor:none}
+.ligne-card:hover{border-color:var(--accent);transform:translateY(-4px)}
+.ligne-num{font-family:var(--sans);font-size:24px;font-weight:800;color:var(--accent)}
+.ligne-name{font-size:11px;color:var(--muted);margin-top:.25rem}
+.ligne-stops{font-size:10px;color:rgba(255,255,255,.3);margin-top:.5rem}
+.back-section{padding:4rem 3rem;text-align:center;border-top:1px solid var(--border)}
+.back-link{font-family:var(--sans);font-size:20px;font-weight:700;color:var(--text);text-decoration:none;border-bottom:2px solid var(--accent);padding-bottom:4px;transition:color .2s}
+.back-link:hover{color:var(--accent)}
+.fade-up{opacity:0;transform:translateY(24px);transition:all .7s cubic-bezier(.16,1,.3,1)}
+.fade-up.visible{opacity:1;transform:translateY(0)}
+@media(max-width:768px){.proj-hero{grid-template-columns:1fr;padding:7rem 1.5rem 3rem;min-height:auto;gap:3rem}.features-grid,.tech-grid,.lignes-grid{grid-template-columns:1fr 1fr}.section{padding:4rem 1.5rem}}
+</style>
+</head>
+<body>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="ring"></div>
+<nav>
+  <a href="portfolio_cheikh_mbow.html" class="nav-logo"><span>~/</span>ctm.dev</a>
+  <a href="portfolio_cheikh_mbow.html" class="nav-back">← Retour au portfolio</a>
+</nav>
+
+<section class="proj-hero">
+  <div class="hero-bg"></div>
+  <div style="position:relative;z-index:1">
+    <div class="proj-number">004 / 005</div>
+    <div class="proj-tag-row">
+      <span class="proj-tag tag-mobile">MOBILE</span>
+      <span class="proj-tag tag-status">● BÊTA</span>
+      <span class="proj-tag tag-year">2024</span>
+    </div>
+    <h1 class="proj-title">Dakar<em>Go</em></h1>
+    <p class="proj-subtitle">Application de mobilité urbaine pour Dakar. Suivi en temps réel des bus Dakar Dem Dikk, planification de trajets et alertes de passage — la première vraie app transport pour Dakar.</p>
+    <div class="proj-stats-row">
+      <div class="pstat"><div class="pstat-n">24</div><div class="pstat-l">LIGNES</div></div>
+      <div class="pstat"><div class="pstat-n">3K+</div><div class="pstat-l">UTILISATEURS</div></div>
+      <div class="pstat"><div class="pstat-n">RT</div><div class="pstat-l">TEMPS RÉEL</div></div>
+    </div>
+    <div class="cta-row">
+      <a href="dakarGo.html" class="btn-p">▶ Voir la démo</a>
+      <a href="#" class="btn-o">⌥ GitHub</a>
+    </div>
+  </div>
+  <div class="map-wrap">
+    <div style="position:relative">
+      <div class="float-badge-map">🚌 Bus 42 — 2min</div>
+      <div class="phone-frame">
+        <div class="notch"></div>
+        <div class="phone-screen">
+          <div class="phone-top-bar">
+            <div class="app-name-t">🚌 DakarGo</div>
+            <div style="font-size:9px;color:rgba(34,211,238,.5)">⬤ Live</div>
+          </div>
+          <div class="map-area">
+            <!-- Roads -->
+            <div class="road road-h" style="top:30%;left:0;right:0"></div>
+            <div class="road road-h" style="top:55%;left:0;right:0"></div>
+            <div class="road road-h" style="top:75%;left:0;right:0"></div>
+            <div class="road road-v" style="left:25%;top:0;bottom:0"></div>
+            <div class="road road-v" style="left:55%;top:0;bottom:0"></div>
+            <div class="road road-v" style="left:80%;top:0;bottom:0"></div>
+            <!-- Route -->
+            <div class="route-line" style="top:30%;left:10%;width:70%"></div>
+            <!-- Stops -->
+            <div class="stop-dot" style="top:calc(30% - 3px);left:10%"></div>
+            <div class="stop-dot" style="top:calc(30% - 3px);left:25%"></div>
+            <div class="stop-dot" style="top:calc(30% - 3px);left:55%"></div>
+            <div class="stop-dot" style="top:calc(30% - 3px);left:80%"></div>
+            <!-- Bus markers -->
+            <div class="bus-marker" style="top:calc(30% - 12px);left:38%">🚌</div>
+            <div class="bus-marker" style="top:calc(30% - 12px);left:62%;animation-delay:.5s;width:20px;height:20px;font-size:9px">🚌</div>
+            <!-- Info card -->
+            <div class="map-card">
+              <div class="bus-info-row">
+                <span class="bus-num">DDD 42</span>
+                <span class="bus-dest">Liberté 6 → Petersen</span>
+                <span class="bus-eta">~2 min</span>
+              </div>
+              <div class="stops-mini">
+                <div class="stop-mini passed"></div>
+                <div style="flex:1;height:1px;background:rgba(34,211,238,.3)"></div>
+                <div class="stop-mini passed"></div>
+                <div style="flex:1;height:1px;background:rgba(34,211,238,.3)"></div>
+                <div class="stop-mini current"></div>
+                <div style="flex:1;height:1px;background:rgba(255,255,255,.1)"></div>
+                <div class="stop-mini"></div>
+                <div style="flex:1;height:1px;background:rgba(255,255,255,.1)"></div>
+                <div class="stop-mini"></div>
+              </div>
+            </div>
+          </div>
+          <div class="bottom-panel">
+            <span class="nav-bot active">🗺️</span>
+            <span class="nav-bot">🔍</span>
+            <span class="nav-bot">⭐</span>
+            <span class="nav-bot">🔔</span>
+            <span class="nav-bot">👤</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-label fade-up">Lignes couvertes</div>
+  <div class="section-title fade-up">Dakar Dem Dikk — en temps réel</div>
+  <div class="lignes-grid">
+    <div class="ligne-card fade-up"><div class="ligne-num">DDD 1</div><div class="ligne-name">Dakar Plateau → Guédiawaye</div><div class="ligne-stops">28 arrêts</div></div>
+    <div class="ligne-card fade-up"><div class="ligne-num">DDD 7</div><div class="ligne-name">Liberté 6 → Rufisque</div><div class="ligne-stops">34 arrêts</div></div>
+    <div class="ligne-card fade-up"><div class="ligne-num">DDD 42</div><div class="ligne-name">Petersen → Liberté 6</div><div class="ligne-stops">18 arrêts</div></div>
+    <div class="ligne-card fade-up"><div class="ligne-num">+21</div><div class="ligne-name">Autres lignes DDD</div><div class="ligne-stops">en cours...</div></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-label fade-up">Fonctionnalités</div>
+  <div class="section-title fade-up">Naviguer à Dakar, enfin simplement</div>
+  <div class="features-grid">
+    <div class="feat-card fade-up"><span class="feat-icon">📍</span><div class="feat-title">Suivi GPS temps réel</div><div class="feat-desc">Position des bus mise à jour toutes les 5 secondes via Socket.io. Carte interactive Google Maps avec position exacte de chaque véhicule.</div></div>
+    <div class="feat-card fade-up"><span class="feat-icon">🗺️</span><div class="feat-title">Planificateur de trajet</div><div class="feat-desc">Entrez votre destination, l'app calcule le meilleur itinéraire multi-lignes, les correspondances et l'heure d'arrivée estimée.</div></div>
+    <div class="feat-card fade-up"><span class="feat-icon">🔔</span><div class="feat-title">Alertes de passage</div><div class="feat-desc">Configurez des alertes pour vos arrêts favoris. Notification push 5, 10 ou 15 minutes avant l'arrivée du bus à votre arrêt.</div></div>
+    <div class="feat-card fade-up"><span class="feat-icon">⭐</span><div class="feat-title">Favoris & Historique</div><div class="feat-desc">Sauvegardez vos trajets et arrêts favoris. Historique des 30 derniers trajets. Suggestions basées sur vos habitudes de déplacement.</div></div>
+    <div class="feat-card fade-up"><span class="feat-icon">📡</span><div class="feat-title">Mode hors-ligne</div><div class="feat-desc">Consultez les horaires et plans de ligne sans connexion. Les données sont mises en cache pour les lignes favorites. Idéal en zone à faible signal.</div></div>
+    <div class="feat-card fade-up"><span class="feat-icon">📊</span><div class="feat-title">Affluence & Confort</div><div class="feat-desc">Indicateurs de remplissage des bus basés sur les données historiques. Recommandations pour éviter les heures de pointe.</div></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-label fade-up">Stack technique</div>
+  <div class="section-title fade-up">Technologies utilisées</div>
+  <div class="tech-grid">
+    <div class="tech-item fade-up"><span class="tech-ico">📱</span><div><div class="tech-info-name">React Native</div><div class="tech-info-role">App mobile iOS & Android</div></div></div>
+    <div class="tech-item fade-up"><span class="tech-ico">🗺️</span><div><div class="tech-info-name">Google Maps API</div><div class="tech-info-role">Cartographie & calcul d'itinéraires</div></div></div>
+    <div class="tech-item fade-up"><span class="tech-ico">⚡</span><div><div class="tech-info-name">Socket.io</div><div class="tech-info-role">Mises à jour temps réel des positions</div></div></div>
+    <div class="tech-item fade-up"><span class="tech-ico">🟩</span><div><div class="tech-info-name">Node.js + Express</div><div class="tech-info-role">API backend & traitement GPS</div></div></div>
+    <div class="tech-item fade-up"><span class="tech-ico">🔥</span><div><div class="tech-info-name">Firebase FCM</div><div class="tech-info-role">Notifications push alertes passage</div></div></div>
+    <div class="tech-item fade-up"><span class="tech-ico">🍃</span><div><div class="tech-info-name">MongoDB</div><div class="tech-info-role">Historique trajets, arrêts, lignes</div></div></div>
+  </div>
+</section>
+
+<div class="back-section">
+  <a href="portfolio_cheikh_mbow.html" class="back-link">← retour</a>
+</div>
+
+<script>
+const cur=document.getElementById('cursor'),ring=document.getElementById('ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx-5+'px';cur.style.top=my-5+'px'});
+(function a(){rx+=(mx-rx-17)*.12;ry+=(my-ry-17)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(a)})();
+document.querySelectorAll('a,button').forEach(el=>{el.addEventListener('mouseenter',()=>{cur.style.transform='scale(2.5)';ring.style.transform='scale(1.5)'});el.addEventListener('mouseleave',()=>{cur.style.transform='scale(1)';ring.style.transform='scale(1)'})});
+const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:.15});
+document.querySelectorAll('.fade-up').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>

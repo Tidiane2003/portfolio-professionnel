@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DakarGo — Démo Interactive</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ff5e00;--surface:#000000;--border:#21212d;--card:#0d0d18;
+  --accent:#34475e;--accent2:#0EA5E9;--green:#00ff11;--orange:#be8a5f;--red:#b03232;--purple:#783968;
+  --text:#ffffff;--muted:#f8dfdf;--mono:'JetBrains Mono',monospace;--sans:'Syne',sans-serif
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--mono);background:var(--bg);color:var(--text);overflow-x:hidden;cursor:none;min-height:100vh}
+.cursor{width:10px;height:10px;background:var(--accent);border-radius:50%;position:fixed;z-index:99999;pointer-events:none;mix-blend-mode:difference;transition:transform .12s}
+.cursor-ring{width:34px;height:34px;border:1.5px solid var(--accent);border-radius:50%;position:fixed;z-index:99998;pointer-events:none;transition:left .1s,top .1s,transform .2s;mix-blend-mode:difference}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--accent);border-radius:3px}
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:1.1rem 3rem;display:flex;align-items:center;justify-content:space-between;background:rgba(10,10,15,.94);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+.nav-logo{font-family:var(--mono);font-size:13px;color:var(--accent);text-decoration:none}
+.nav-logo span{color:var(--muted)}
+.nav-right{display:flex;align-items:center;gap:12px}
+.live-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 1.3s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+.nav-badge{font-size:10px;padding:4px 12px;border:1px solid rgba(34,211,238,.25);color:var(--accent);background:rgba(34,211,238,.05);letter-spacing:.1em;display:flex;align-items:center;gap:6px}
+.nav-conn{font-size:10px;color:var(--muted)}
+.nav-conn span{color:var(--text)}
+.hero{padding:7rem 3rem 3rem;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start;position:relative;overflow:hidden;min-height:100vh}
+.hero-bg{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 60% 55% at 78% 45%,rgba(34,211,238,.07),transparent),radial-gradient(ellipse 35% 35% at 8% 75%,rgba(14,165,233,.05),transparent),radial-gradient(ellipse 50% 30% at 50% 100%,rgba(167,139,250,.03),transparent)}
+.proj-num{font-size:10px;color:var(--muted);letter-spacing:.15em;margin-bottom:.6rem}
+.tag-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:1.4rem}
+.tag{font-size:10px;padding:3px 10px;border:1px solid;letter-spacing:.1em}
+.tag-m{border-color:rgba(34,211,238,.3);color:var(--accent);background:rgba(34,211,238,.06)}
+.tag-s{border-color:rgba(74,222,128,.3);color:var(--green);background:rgba(74,222,128,.06)}
+.tag-y{border-color:var(--border);color:var(--muted)}
+.hero-title{font-family:var(--sans);font-size:clamp(38px,5.5vw,68px);font-weight:800;line-height:1;letter-spacing:-.03em;margin-bottom:.4rem}
+.hero-title em{color:var(--accent);font-style:normal}
+.hero-sub{font-size:13px;color:var(--muted);line-height:1.75;margin-bottom:1.75rem;max-width:430px}
+.socket-bar{display:flex;align-items:center;gap:10px;padding:9px 14px;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--green);font-size:11px;margin-bottom:1.5rem;flex-wrap:wrap;row-gap:4px}
+.socket-bar .sl{color:var(--muted)}
+.socket-bar .sv{font-weight:600}
+.sv.ok{color:var(--green)}
+.sep{color:rgba(255,255,255,.1)}
+.stats-row{display:flex;gap:2rem;margin-bottom:1.75rem}
+.stat-b .sn{font-family:var(--sans);font-size:28px;font-weight:800;color:var(--accent);line-height:1}
+.stat-b .sl2{font-size:9px;color:var(--muted);letter-spacing:.1em;margin-top:3px}
+.tech-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1.4rem}
+.pill{font-size:10px;padding:4px 10px;border:1px solid var(--border);color:var(--muted);border-radius:3px;display:flex;align-items:center;gap:5px;transition:all .2s;cursor:default}
+.pill:hover{border-color:rgba(34,211,238,.4);color:var(--accent)}
+.log-wrap{background:var(--surface);border:1px solid var(--border);overflow:hidden}
+.log-header{padding:.5rem .85rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.log-header-title{font-size:10px;color:var(--muted);letter-spacing:.1em}
+.log-hbs{display:flex;gap:5px}
+.log-hb{font-size:8px;padding:2px 6px;border-radius:2px}
+.log-hb.emit{background:rgba(34,211,238,.12);color:var(--accent)}
+.log-hb.recv{background:rgba(74,222,128,.1);color:var(--green)}
+.log-body{padding:.75rem;max-height:155px;overflow-y:auto;font-size:10px}
+.log-body::-webkit-scrollbar{width:2px}
+.log-entry{display:flex;gap:8px;margin-bottom:.3rem;animation:slideIn .25s ease}
+@keyframes slideIn{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:none}}
+.lt{color:var(--muted);flex-shrink:0;min-width:34px}
+.ltype{padding:1px 5px;border-radius:2px;font-size:8px;flex-shrink:0;min-width:32px;text-align:center}
+.ltype.emit{background:rgba(34,211,238,.12);color:var(--accent)}
+.ltype.recv{background:rgba(74,222,128,.1);color:var(--green)}
+.ltype.sys{background:rgba(75,85,99,.25);color:var(--muted)}
+.ltype.fcm{background:rgba(251,146,60,.12);color:var(--orange)}
+.lmsg{color:rgba(226,232,240,.65);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* PHONE */
+.demo-wrap{position:relative;z-index:1;display:flex;justify-content:center;align-items:flex-start;padding-top:1.5rem}
+.phone-outer{position:relative}
+.float-b1{position:absolute;top:80px;right:-22px;background:var(--accent);color:#0A0A0F;border-radius:10px;padding:7px 11px;font-size:9px;font-weight:700;box-shadow:0 8px 28px rgba(34,211,238,.5);animation:float 3s ease-in-out infinite;z-index:10;white-space:nowrap;line-height:1.5}
+.float-b2{position:absolute;bottom:140px;left:-28px;background:#0d1825;border:1px solid rgba(34,211,238,.2);color:var(--text);border-radius:10px;padding:8px 12px;font-size:9px;box-shadow:0 8px 24px rgba(0,0,0,.6);animation:float 3s ease-in-out .7s infinite;z-index:10;white-space:nowrap;line-height:1.5}
+.float-b3{position:absolute;bottom:60px;right:-18px;background:#0d1825;border:1px solid rgba(74,222,128,.2);color:var(--green);border-radius:10px;padding:7px 11px;font-size:9px;animation:float 3.5s ease-in-out 1.2s infinite;z-index:10;white-space:nowrap}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+.phone-frame{width:264px;background:#13131f;border-radius:42px;border:2.5px solid #242438;overflow:hidden;box-shadow:0 50px 130px rgba(0,0,0,.85),0 0 0 1px rgba(34,211,238,.04),inset 0 1px 0 rgba(255,255,255,.04)}
+.phone-notch{width:72px;height:22px;background:#13131f;border-radius:0 0 14px 14px;position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:20;border-bottom:1px solid #242438}
+.phone-screen{background:#040e1c;display:flex;flex-direction:column;height:540px}
+.app-topbar{padding:.6rem 1rem .5rem;display:flex;align-items:center;justify-content:space-between;background:#030b17;border-bottom:1px solid rgba(34,211,238,.07);z-index:10;flex-shrink:0}
+.app-name{font-size:11px;font-weight:700;color:var(--accent);letter-spacing:.05em}
+.live-ind{display:flex;align-items:center;gap:4px;font-size:9px;color:var(--green)}
+.app-tabs{display:flex;border-bottom:1px solid rgba(34,211,238,.07);background:#030b17;flex-shrink:0}
+.tab-btn{flex:1;padding:.45rem .2rem;font-size:8.5px;background:none;border:none;color:var(--muted);cursor:pointer;letter-spacing:.03em;transition:all .2s;border-bottom:2px solid transparent;font-family:var(--mono)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);background:rgba(34,211,238,.04)}
+/* MAP */
+.map-view{flex:1;position:relative;overflow:hidden;display:none}
+.map-view.active{display:block}
+.map-canvas{width:100%;height:100%;background:linear-gradient(160deg,#030e1c 0%,#040a16 100%);position:relative}
+.map-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(34,211,238,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(34,211,238,.03) 1px,transparent 1px);background-size:22px 22px}
+.road{position:absolute;background:rgba(255,255,255,.07)}
+.road-h{height:2px}.road-v{width:2px}
+.road.main-h{height:3px;background:rgba(255,255,255,.13)}
+.road.main-v{width:3px;background:rgba(255,255,255,.13)}
+.rline{position:absolute;height:3px;border-radius:2px}
+.rline.l42{background:linear-gradient(90deg,var(--accent),rgba(34,211,238,.35));top:calc(30% - 1.5px);left:5%;width:82%}
+.rline.l7{background:linear-gradient(90deg,rgba(14,165,233,.6),rgba(14,165,233,.2));top:calc(56% - 1.5px);left:20%;width:65%}
+.rline.l1{background:linear-gradient(0deg,rgba(74,222,128,.5),rgba(74,222,128,.15));left:calc(22% - 1.5px);top:8%;height:72%;width:3px}
+.snode{position:absolute;transform:translate(-50%,-50%);z-index:4;cursor:pointer}
+.sdot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.8);border:2px solid var(--accent);box-shadow:0 0 5px rgba(34,211,238,.3);transition:transform .2s}
+.sdot.here{background:var(--accent);box-shadow:0 0 12px rgba(34,211,238,.8);animation:sdp 1.2s ease-in-out infinite}
+@keyframes sdp{0%,100%{transform:scale(1)}50%{transform:scale(1.5)}}
+.snode:hover .sdot{transform:scale(1.4)}
+.stip{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);background:rgba(3,11,23,.95);border:1px solid rgba(34,211,238,.25);padding:2px 7px;font-size:7px;border-radius:3px;white-space:nowrap;color:#fff;pointer-events:none;opacity:0;transition:opacity .15s}
+.snode:hover .stip{opacity:1}
+.bpin{position:absolute;transform:translate(-50%,-50%);z-index:6;cursor:pointer;transition:left 3.5s linear,top 3.5s linear}
+.bpin-lbl{position:absolute;top:-19px;left:50%;transform:translateX(-50%);background:rgba(3,11,23,.92);border:1px solid rgba(34,211,238,.3);padding:1px 5px;font-size:7.5px;border-radius:3px;white-space:nowrap;color:var(--accent);pointer-events:none}
+.bpin-ico{border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,.25);animation:bpulse 2s ease-in-out infinite}
+.bpin-ico.lg{width:28px;height:28px;font-size:13px;background:var(--accent);box-shadow:0 0 14px rgba(34,211,238,.7)}
+.bpin-ico.md{width:22px;height:22px;font-size:10px;background:var(--accent2);box-shadow:0 0 10px rgba(14,165,233,.6);animation-delay:.5s}
+.bpin-ico.sm{width:18px;height:18px;font-size:9px;background:var(--green);box-shadow:0 0 10px rgba(74,222,128,.5);animation-delay:.9s}
+@keyframes bpulse{0%,100%{box-shadow:0 0 14px rgba(34,211,238,.6)}50%{box-shadow:0 0 26px rgba(34,211,238,1),0 0 48px rgba(34,211,238,.25)}}
+.map-card{position:absolute;bottom:0;left:0;right:0;background:rgba(3,11,23,.97);border-top:1px solid rgba(34,211,238,.14);padding:.7rem .75rem;backdrop-filter:blur(10px)}
+.brow{display:flex;align-items:center;gap:7px;margin-bottom:.45rem}
+.bbadge{background:var(--accent);color:#0A0A0F;padding:2px 7px;border-radius:4px;font-size:8.5px;font-weight:700}
+.broute{font-size:8.5px;color:#fff;font-weight:600;flex:1}
+.beta{font-size:8.5px;font-weight:700;color:var(--green)}
+.ptrack{display:flex;align-items:center;gap:3px;margin-bottom:.4rem}
+.ps{width:6px;height:6px;border-radius:50%;background:rgba(34,211,238,.2);flex-shrink:0}
+.ps.d{background:var(--accent)}
+.ps.h{background:#fff;box-shadow:0 0 8px rgba(255,255,255,.9);animation:hpulse 1s ease-in-out infinite}
+@keyframes hpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.45)}}
+.pl{flex:1;height:1px;background:rgba(34,211,238,.12)}
+.pl.d{background:rgba(34,211,238,.45)}
+.bfoot{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px}
+.bfl{font-size:7.5px;color:var(--muted)}
+.bfv{font-size:7.5px;color:var(--accent)}
+.occ{display:flex;gap:2px}
+.ocs{width:7px;height:4px;border-radius:1px;background:rgba(255,255,255,.08)}
+.ocs.f{background:var(--green)}.ocs.x{background:var(--orange)}
+.map-cluster{position:absolute;top:8px;right:8px;background:rgba(3,11,23,.9);border:1px solid rgba(34,211,238,.2);border-radius:6px;padding:5px 8px;font-size:8px;color:var(--accent)}
+.push-notif{position:absolute;top:8px;left:8px;right:8px;background:#0d1825;border:1px solid rgba(34,211,238,.25);border-radius:10px;padding:.6rem .75rem;z-index:15;animation:notifIn .35s cubic-bezier(.16,1,.3,1);box-shadow:0 8px 30px rgba(0,0,0,.5)}
+@keyframes notifIn{from{transform:translateY(-20px);opacity:0}to{transform:none;opacity:1}}
+.pn-top{display:flex;align-items:center;gap:6px;margin-bottom:.25rem}
+.pn-app{font-size:8px;color:var(--accent);font-weight:600}
+.pn-time{font-size:8px;color:var(--muted);margin-left:auto}
+.pn-title{font-size:9.5px;font-weight:600;margin-bottom:.15rem}
+.pn-body{font-size:8.5px;color:var(--muted)}
+/* SEARCH */
+.search-view{flex:1;display:none;flex-direction:column;overflow:hidden}
+.search-view.active{display:flex}
+.sbox{margin:.6rem .65rem .3rem;background:#030b17;border:1px solid rgba(34,211,238,.18);border-radius:7px;padding:.5rem .75rem;display:flex;align-items:center;gap:7px}
+.sbox input{background:none;border:none;color:var(--text);font-size:10.5px;font-family:var(--mono);flex:1;outline:none}
+.sbox input::placeholder{color:var(--muted)}
+.sico{color:var(--accent);font-size:11px}
+.rr-wrap{flex:1;overflow-y:auto;padding:.3rem .65rem .65rem}
+.rr-wrap::-webkit-scrollbar{width:2px}
+.rcard{background:#030b17;border:1px solid var(--border);border-radius:7px;padding:.65rem;margin-bottom:.45rem;cursor:pointer;transition:all .2s}
+.rcard:hover{border-color:rgba(34,211,238,.4);background:#050f1e}
+.rcard.sel{border-color:rgba(34,211,238,.5);background:#041020}
+.rcard-top{display:flex;align-items:center;gap:6px;margin-bottom:.3rem}
+.rtag{font-size:7.5px;background:rgba(34,211,238,.1);color:var(--accent);padding:2px 5px;border-radius:3px;font-weight:600}
+.rtag.exp{background:rgba(74,222,128,.1);color:var(--green)}
+.rtag.cor{background:rgba(167,139,250,.1);color:var(--purple)}
+.rtime{font-size:8px;color:var(--green);font-weight:700;margin-left:auto}
+.rname{font-size:9.5px;font-weight:600;color:var(--text);margin-bottom:.15rem}
+.rdet{font-size:8.5px;color:var(--muted);line-height:1.4}
+.rbar{display:flex;align-items:center;gap:4px;margin-top:.35rem}
+.rdot{width:5px;height:5px;border-radius:50%;background:var(--accent);flex-shrink:0}
+.rlinee{flex:1;height:1px;background:rgba(34,211,238,.18);position:relative;overflow:hidden}
+.rbus{position:absolute;top:-5px;font-size:8px;animation:mvbus 2.8s linear infinite}
+@keyframes mvbus{0%{left:0}100%{left:90%}}
+.rstops{display:flex;justify-content:space-between;margin-top:.15rem}
+.rstop{font-size:6.5px;color:var(--muted)}
+/* ALERTS */
+.alerts-view{flex:1;display:none;flex-direction:column;overflow:hidden}
+.alerts-view.active{display:flex}
+.av-head{padding:.6rem .75rem;font-size:9px;color:var(--muted);border-bottom:1px solid var(--border);display:flex;justify-content:space-between}
+.av-hb{font-size:8px;background:rgba(251,146,60,.12);color:var(--orange);padding:1px 6px;border-radius:3px}
+.alist{flex:1;overflow-y:auto;padding:.4rem .65rem}
+.alist::-webkit-scrollbar{width:2px}
+.aitem{display:flex;gap:9px;padding:.55rem 0;border-bottom:1px solid rgba(255,255,255,.035);align-items:flex-start;animation:slideIn .3s ease}
+.aico{font-size:14px;flex-shrink:0;line-height:1.2}
+.acont .at{font-size:9.5px;font-weight:600;margin-bottom:1px}
+.acont .as{font-size:8.5px;color:var(--muted);line-height:1.45}
+.atime{font-size:7.5px;color:var(--muted);margin-left:auto;flex-shrink:0}
+.aitem.new .at{color:var(--accent)}
+.aitem.warn .at{color:var(--orange)}
+.aitem.ok .at{color:var(--green)}
+.fcm-badge{font-size:7px;background:rgba(251,146,60,.1);color:var(--orange);border:1px solid rgba(251,146,60,.2);padding:1px 4px;border-radius:2px;margin-left:4px}
+/* FAVS */
+.favs-view{flex:1;display:none;flex-direction:column;overflow:hidden}
+.favs-view.active{display:flex}
+.flist{flex:1;overflow-y:auto;padding:.5rem .65rem}
+.flist::-webkit-scrollbar{width:2px}
+.fitem{background:#030b17;border:1px solid var(--border);border-radius:7px;padding:.6rem;margin-bottom:.4rem;display:flex;align-items:center;gap:9px;cursor:pointer;transition:all .2s}
+.fitem:hover{border-color:rgba(34,211,238,.3);background:#050f1e}
+.fico{font-size:16px;flex-shrink:0}
+.finfo .fn{font-size:9.5px;font-weight:600}
+.finfo .fs{font-size:8.5px;color:var(--muted);margin-top:1px}
+.finfo .feta{font-size:8px;color:var(--accent);margin-top:2px}
+.off-badge{font-size:7px;background:rgba(74,222,128,.1);color:var(--green);border:1px solid rgba(74,222,128,.2);padding:1px 5px;border-radius:2px;margin-top:2px;display:inline-block}
+.farrow{margin-left:auto;color:var(--muted);font-size:11px}
+.bnav{background:#030b17;border-top:1px solid rgba(34,211,238,.07);display:flex;flex-shrink:0}
+.bni{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;padding:.4rem .2rem;cursor:pointer;background:none;border:none;font-family:var(--mono);transition:background .2s}
+.bni .bni-ico{font-size:14px;opacity:.3;transition:opacity .2s}
+.bni .bni-lbl{font-size:6.5px;color:var(--muted);letter-spacing:.04em}
+.bni.active .bni-ico{opacity:1}
+.bni.active .bni-lbl{color:var(--accent)}
+/* SECTIONS */
+.section{padding:5.5rem 3rem;border-top:1px solid var(--border)}
+.sec-label{font-size:10px;color:var(--accent);letter-spacing:.2em;text-transform:uppercase;margin-bottom:.5rem}
+.sec-title{font-family:var(--sans);font-size:clamp(26px,3vw,40px);font-weight:800;letter-spacing:-.025em;margin-bottom:2.5rem}
+/* DASHBOARD */
+.rt-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem}
+.rt-card{background:var(--surface);border:1px solid var(--border);padding:1.25rem;transition:border-color .3s}
+.rt-card:hover{border-color:rgba(34,211,238,.3)}
+.rt-card-lbl{font-size:9px;color:var(--muted);letter-spacing:.1em;margin-bottom:.5rem}
+.rt-card-val{font-family:var(--sans);font-size:30px;font-weight:800;color:var(--accent);line-height:1}
+.rt-card-sub{font-size:9px;color:var(--muted);margin-top:.3rem}
+.rt-card-sub .up{color:var(--green)}
+.chart-wrap{background:var(--surface);border:1px solid var(--border);padding:1.25rem;margin-bottom:2rem}
+.chart-title{font-size:11px;color:var(--muted);margin-bottom:1rem;display:flex;justify-content:space-between}
+.chart-canvas{height:80px;position:relative;overflow:hidden}
+.chart-bars{display:flex;align-items:flex-end;gap:3px;height:100%}
+.cbar{flex:1;border-radius:2px 2px 0 0;transition:height .5s ease;min-height:4px;background:rgba(34,211,238,.22)}
+.cbar.peak{background:rgba(34,211,238,.6)}
+.cbar.now{background:var(--accent)}
+.chart-baseline{position:absolute;bottom:0;left:0;right:0;height:1px;background:var(--border)}
+/* FCM */
+.fcm-demo{background:var(--surface);border:1px solid var(--border);padding:1.25rem;margin-bottom:2rem}
+.fcm-demo-title{font-size:11px;color:var(--muted);letter-spacing:.1em;margin-bottom:1rem}
+.fcm-phones{display:flex;gap:1rem;overflow-x:auto;padding-bottom:.5rem}
+.mini-phone{width:120px;flex-shrink:0;background:#0d0d1e;border:1px solid #242438;border-radius:20px;overflow:hidden;animation:slideIn .4s ease}
+.mp-bar{background:#080818;padding:.35rem .5rem;font-size:7px;color:var(--orange);text-align:center;border-bottom:1px solid #242438}
+.mp-screen{background:#0a0a18;min-height:90px;padding:.4rem}
+.mp-notif{background:#111828;border-left:3px solid var(--orange);border-radius:4px;padding:.35rem .5rem;margin-bottom:.3rem}
+.mpn-app{font-size:6px;color:var(--orange);font-weight:600;margin-bottom:1px}
+.mpn-title{font-size:7px;font-weight:600}
+.mpn-body{font-size:6.5px;color:var(--muted);line-height:1.35}
+/* BACKEND */
+.backend-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem}
+.be-panel{background:var(--surface);border:1px solid var(--border);padding:1.25rem}
+.be-title{font-size:11px;color:var(--muted);letter-spacing:.1em;margin-bottom:1rem;display:flex;align-items:center;gap:8px}
+.be-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.mongo-doc{background:#070712;border:1px solid var(--border);border-radius:4px;padding:.75rem;font-size:10px;line-height:1.85;margin-bottom:.6rem}
+.mj-key{color:var(--accent)}.mj-str{color:#A5F3C4}.mj-num{color:#FCA5A5}.mj-bool{color:var(--orange)}.mj-muted{color:var(--muted)}
+.route-row{display:flex;align-items:center;gap:8px;padding:.45rem 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:10px}
+.method{padding:1px 6px;border-radius:2px;font-size:8.5px;font-weight:700;min-width:36px;text-align:center;flex-shrink:0}
+.method.GET{background:rgba(74,222,128,.12);color:var(--green)}
+.method.POST{background:rgba(34,211,238,.12);color:var(--accent)}
+.method.WS{background:rgba(167,139,250,.12);color:var(--purple)}
+.rpath{color:var(--text);flex:1;font-size:9.5px}
+.rms{font-size:8px;color:var(--muted)}
+.rms span{color:var(--accent)}
+.rstatus{font-size:8px;padding:1px 5px;border-radius:2px}
+.rstatus.ok{background:rgba(74,222,128,.1);color:var(--green)}
+.rstatus.live{background:rgba(167,139,250,.12);color:var(--purple)}
+/* ARCHITECTURE */
+.arch-grid{display:grid;grid-template-columns:1fr 80px 1fr;gap:1.5rem;align-items:start}
+.arch-col{display:flex;flex-direction:column;gap:.75rem}
+.abox{background:var(--surface);border:1px solid var(--border);padding:.85rem 1rem;transition:border-color .25s,background .25s}
+.abox:hover{border-color:rgba(34,211,238,.4);background:#0d0d1e}
+.abox .ab-ico{font-size:18px;margin-bottom:.35rem;display:block}
+.abox .abt{font-size:11px;font-weight:600;margin-bottom:2px}
+.abox .abs{font-size:9px;color:var(--muted)}
+.abox.hl{border-color:rgba(34,211,238,.25);background:#080d18}
+.arch-mid{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;padding-top:1rem}
+.amid-ico{font-size:20px;color:var(--accent)}
+.amid-lbl{font-size:8px;color:var(--muted);letter-spacing:.12em;text-align:center}
+.data-flow{height:55px;width:2px;background:linear-gradient(180deg,var(--accent),transparent);margin:0 auto;animation:flowglow 2s linear infinite}
+@keyframes flowglow{0%{opacity:.3}50%{opacity:1}100%{opacity:.3}}
+/* MAP SVG */
+.dakar-wrap{background:var(--surface);border:1px solid var(--border);overflow:hidden;position:relative}
+.dm-title{position:absolute;top:1rem;right:1rem;background:rgba(3,11,23,.92);border:1px solid var(--border);padding:.4rem .8rem;font-size:11px;font-weight:600;z-index:5}
+.dm-overlay{position:absolute;top:1rem;left:1rem;z-index:5}
+.dm-leg{background:rgba(3,11,23,.92);border:1px solid rgba(34,211,238,.2);padding:.5rem .7rem;font-size:9px}
+.dm-lr{display:flex;align-items:center;gap:6px;margin-bottom:3px}
+.dm-ld{width:10px;height:3px;border-radius:1px}
+/* LINES */
+.lines-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.85rem}
+.lcard{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1.1rem;text-align:center;cursor:pointer;transition:all .25s;position:relative;overflow:hidden}
+.lcard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent);transform:scaleX(0);transition:transform .3s;transform-origin:left}
+.lcard:hover{border-color:rgba(34,211,238,.4);transform:translateY(-5px);background:#0d0d1e}
+.lcard:hover::before{transform:scaleX(1)}
+.lnum{font-family:var(--sans);font-size:22px;font-weight:800;color:var(--accent);line-height:1}
+.lname{font-size:10px;color:var(--muted);margin-top:.25rem;line-height:1.4}
+.lstops{font-size:9px;color:rgba(255,255,255,.2);margin-top:.35rem}
+.lstat{font-size:8px;margin-top:.4rem}
+.lstat.ok{color:var(--green)}.lstat.delay{color:var(--orange)}.lstat.soon{color:var(--muted)}
+/* FEATURES */
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border)}
+.fgitem{background:var(--surface);padding:1.75rem;transition:background .2s}
+.fgitem:hover{background:#0d0d1e}
+.fgico{font-size:26px;margin-bottom:.85rem;display:block}
+.fgt{font-family:var(--sans);font-size:15px;font-weight:700;margin-bottom:.4rem}
+.fgd{font-size:11px;color:var(--muted);line-height:1.7}
+.fgtag{display:inline-block;font-size:8px;border:1px solid rgba(34,211,238,.2);color:var(--accent);padding:1px 6px;border-radius:2px;margin-top:.5rem;letter-spacing:.08em}
+/* FOOTER */
+.footer-bar{padding:3rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+.footer-logo{font-family:var(--sans);font-size:18px;font-weight:800;color:var(--accent)}
+.footer-stack{font-size:10px;color:var(--muted);line-height:1.8}
+.footer-credit{font-size:11px;color:var(--muted)}
+.footer-credit span{color:var(--text)}
+/* FADE */
+.fade-up{opacity:0;transform:translateY(22px);transition:opacity .65s cubic-bezier(.16,1,.3,1),transform .65s cubic-bezier(.16,1,.3,1)}
+.fade-up.visible{opacity:1;transform:none}
+.fade-up:nth-child(2){transition-delay:.08s}
+.fade-up:nth-child(3){transition-delay:.16s}
+.fade-up:nth-child(4){transition-delay:.24s}
+.fade-up:nth-child(5){transition-delay:.32s}
+/* ── CODE SNIPPETS ── */
+.code-tab{padding:.45rem 1rem;font-size:10px;background:var(--surface);border:none;border-right:1px solid var(--border);color:var(--muted);cursor:pointer;font-family:var(--mono);letter-spacing:.04em;transition:all .2s;white-space:nowrap}
+.code-tab:last-child{border-right:none}
+.code-tab.active{color:var(--accent);background:#080d18;border-bottom:2px solid var(--accent)}
+.code-tab:hover:not(.active){color:var(--text);background:#0d0d1e}
+.code-block{background:#070712;border:1px solid var(--border);padding:1.1rem;overflow-x:auto;font-size:10.5px;line-height:1.8;min-height:240px}
+.code-block pre{margin:0;font-family:var(--mono)}
+.code-block::-webkit-scrollbar{height:3px}
+/* Syntax highlight helpers */
+.ck{color:#C792EA}   /* keyword */
+.cs{color:#A5F3C4}   /* string */
+.cf{color:#82AAFF}   /* function */
+.cn{color:#FCA5A5}   /* number */
+.cb{color:#FB923C}   /* boolean */
+.cm{color:#4A5568}   /* comment */
+.ct{color:#22D3EE}   /* jsx tag */
+
+/* ── TIMELINE ── */
+.timeline{position:relative;padding-left:2rem}
+.tline-track{position:absolute;left:0;top:12px;bottom:12px;width:2px;background:linear-gradient(180deg,var(--accent),rgba(34,211,238,.1))}
+.titem{position:relative;display:grid;grid-template-columns:24px 1fr;gap:1.25rem;margin-bottom:1.5rem;align-items:start}
+.tnode{display:flex;align-items:flex-start;justify-content:center;padding-top:4px}
+.tnode-dot{width:14px;height:14px;border-radius:50%;background:var(--accent);border:3px solid var(--bg);box-shadow:0 0 0 2px var(--accent),0 0 12px rgba(34,211,238,.5);flex-shrink:0}
+.tnode-dot.pulse{animation:tdotpulse 1.5s ease-in-out infinite}
+@keyframes tdotpulse{0%,100%{box-shadow:0 0 0 2px var(--accent),0 0 12px rgba(34,211,238,.5)}50%{box-shadow:0 0 0 4px var(--accent),0 0 24px rgba(34,211,238,.8)}}
+.tnode-dot.dim{background:var(--border);border-color:var(--bg);box-shadow:0 0 0 2px var(--border)}
+.tcard{background:var(--surface);border:1px solid var(--border);padding:1rem 1.25rem;transition:border-color .25s}
+.tcard:hover{border-color:rgba(34,211,238,.3)}
+.titem.active .tcard{border-color:rgba(34,211,238,.3);background:#080d18}
+.dim-card{opacity:.45}
+.tc-date{font-size:9px;color:var(--muted);letter-spacing:.1em;margin-bottom:.25rem}
+.tc-title{font-family:var(--sans);font-size:15px;font-weight:700;margin-bottom:.35rem}
+.titem.active .tc-title{color:var(--accent)}
+.tc-desc{font-size:11px;color:var(--muted);line-height:1.65;margin-bottom:.6rem}
+.tc-tags{display:flex;gap:5px;flex-wrap:wrap}
+.tctag{font-size:9px;padding:2px 7px;border:1px solid var(--border);color:var(--muted);border-radius:2px}
+.tctag-live{border-color:rgba(74,222,128,.3);color:var(--green);background:rgba(74,222,128,.07)}
+
+/* ── IMPACT CARDS ── */
+.impact-card{background:var(--surface);border:1px solid var(--border);padding:1.5rem;transition:border-color .3s}
+.impact-card:hover{border-color:rgba(34,211,238,.3)}
+.ic-num{font-family:var(--sans);font-size:42px;font-weight:800;color:var(--accent);line-height:1;margin-bottom:.4rem}
+.ic-label{font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:.75rem}
+.ic-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.ic-fill{height:100%;background:var(--accent);border-radius:2px;width:0;transition:width 1.5s cubic-bezier(.16,1,.3,1)}
+
+/* ── PEAK CHART ── */
+.peak-chart{display:flex;align-items:flex-end;gap:3px;height:60px;margin-bottom:.25rem}
+.peak-bar{flex:1;border-radius:2px 2px 0 0;background:rgba(34,211,238,.2);transition:background .3s}
+.peak-bar.hi{background:var(--orange)}
+.peak-bar.med{background:rgba(34,211,238,.5)}
+
+/* ── TESTIMONIALS ── */
+.testi{background:var(--surface);border:1px solid var(--border);padding:1.5rem;transition:border-color .25s,transform .25s}
+.testi:hover{border-color:rgba(34,211,238,.25);transform:translateY(-4px)}
+.testi-stars{color:var(--orange);font-size:12px;margin-bottom:.75rem;letter-spacing:.1em}
+.testi-text{font-size:12px;color:var(--muted);line-height:1.75;margin-bottom:1rem;font-style:italic}
+.testi-author{display:flex;align-items:center;gap:.75rem}
+.testi-avatar{width:32px;height:32px;border-radius:50%;background:rgba(34,211,238,.12);border:1px solid rgba(34,211,238,.25);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--accent);flex-shrink:0}
+.testi-name{font-size:11px;font-weight:600}
+.testi-loc{font-size:9px;color:var(--muted);margin-top:1px}
+
+/* ── ONBOARDING SCREENS extra tab ── */
+.screen-view{flex:1;display:none;flex-direction:column;overflow:hidden;background:#030b17}
+.screen-view.active{display:flex}
+.onboard-slides{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;text-align:center}
+.ob-ico{font-size:42px;margin-bottom:1rem;animation:obico 2s ease-in-out infinite}
+@keyframes obico{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.ob-title{font-family:var(--sans);font-size:14px;font-weight:700;margin-bottom:.5rem;color:var(--text)}
+.ob-sub{font-size:10px;color:var(--muted);line-height:1.6;margin-bottom:1.5rem}
+.ob-dots{display:flex;gap:5px;justify-content:center;margin-bottom:1rem}
+.ob-dot{width:6px;height:6px;border-radius:50%;background:rgba(34,211,238,.2)}
+.ob-dot.active{background:var(--accent);width:16px;border-radius:3px}
+.ob-btn{background:var(--accent);color:#0A0A0F;font-size:10px;font-weight:700;padding:.5rem 1.25rem;border:none;border-radius:20px;cursor:pointer;font-family:var(--mono);letter-spacing:.05em;transition:opacity .2s}
+.ob-btn:hover{opacity:.85}
+.ob-skip{font-size:9px;color:var(--muted);cursor:pointer;margin-top:.5rem;background:none;border:none;font-family:var(--mono)}
+
+/* ── PROFILE SCREEN ── */
+.profile-view{flex:1;display:none;flex-direction:column;overflow:hidden}
+.profile-view.active{display:flex}
+.prof-header{padding:1rem;background:#030b17;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.75rem}
+.prof-avatar{width:38px;height:38px;border-radius:50%;background:rgba(34,211,238,.12);border:2px solid rgba(34,211,238,.3);display:flex;align-items:center;justify-content:center;font-size:16px}
+.prof-name{font-size:11px;font-weight:600}
+.prof-sub{font-size:9px;color:var(--muted);margin-top:1px}
+.prof-badge{font-size:8px;background:rgba(74,222,128,.1);color:var(--green);border:1px solid rgba(74,222,128,.2);padding:1px 6px;border-radius:10px}
+.prof-body{flex:1;overflow-y:auto;padding:.5rem .65rem}
+.prof-body::-webkit-scrollbar{width:2px}
+.prof-section{margin-bottom:.75rem}
+.prof-sec-title{font-size:8px;color:var(--muted);letter-spacing:.12em;padding:.4rem 0;border-bottom:1px solid var(--border);margin-bottom:.35rem}
+.prof-row{display:flex;align-items:center;gap:.6rem;padding:.4rem 0;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer}
+.prof-row-ico{font-size:13px;flex-shrink:0}
+.prof-row-label{font-size:9.5px;flex:1}
+.prof-row-val{font-size:9px;color:var(--accent)}
+.prof-row-arr{font-size:10px;color:var(--muted)}
+/* toggle */
+.toggle{width:28px;height:15px;background:var(--border);border-radius:10px;position:relative;cursor:pointer;transition:background .25s;flex-shrink:0}
+.toggle.on{background:var(--accent)}
+.toggle::after{content:'';position:absolute;width:11px;height:11px;background:#fff;border-radius:50%;top:2px;left:2px;transition:transform .25s}
+.toggle.on::after{transform:translateX(13px)}
+
+@media(max-width:900px){
+  .hero{grid-template-columns:1fr;padding:6rem 1.5rem 2.5rem;min-height:auto;gap:2.5rem}
+  .section{padding:3.5rem 1.5rem}
+  .rt-grid{grid-template-columns:repeat(2,1fr)}
+  .backend-grid{grid-template-columns:1fr}
+  .arch-grid{grid-template-columns:1fr}
+  .feat-grid{grid-template-columns:1fr 1fr}
+  .lines-grid{grid-template-columns:repeat(2,1fr)}
+  nav{padding:1rem 1.5rem}
+  .titem{grid-template-columns:20px 1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="ring"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo"><span>~/</span>ctm.dev — DakarGo</a>
+  <div class="nav-right">
+    <span class="nav-conn">Connexions : <span id="conn-count">1</span></span>
+    <span class="nav-badge"><span class="live-dot"></span>SOCKET.IO ACTIF</span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div style="position:relative;z-index:1">
+    <div class="proj-num">004 / 005</div>
+    <div class="tag-row">
+      <span class="tag tag-m">REACT NATIVE</span>
+      <span class="tag tag-s">● BÊTA LIVE</span>
+      <span class="tag tag-y">DAKAR 2024</span>
+    </div>
+    <h1 class="hero-title">Dakar<em>Go</em></h1>
+    <p class="hero-sub">Application de mobilité urbaine pour Dakar. Suivi GPS en temps réel des bus Dakar Dem Dikk via Socket.io, planification multi-lignes et alertes Firebase FCM.</p>
+    <div class="socket-bar">
+      <span class="live-dot"></span>
+      <span class="sl">Socket.io</span><span class="sv ok">Connecté</span>
+      <span class="sep">|</span>
+      <span class="sl">Ping</span><span class="sv" style="color:var(--accent)" id="ping-val">18ms</span>
+      <span class="sep">|</span>
+      <span class="sl">Bus actifs</span><span class="sv" style="color:var(--accent)" id="bus-count">7</span>
+      <span class="sep">|</span>
+      <span class="sl">GPS/s</span><span class="sv ok" id="ups">~3.2</span>
+    </div>
+    <div class="stats-row">
+      <div class="stat-b"><div class="sn">24</div><div class="sl2">LIGNES</div></div>
+      <div class="stat-b"><div class="sn">3K+</div><div class="sl2">UTILISATEURS</div></div>
+      <div class="stat-b"><div class="sn" id="gps-updates">0</div><div class="sl2">MAJ GPS</div></div>
+      <div class="stat-b"><div class="sn" id="notif-count">0</div><div class="sl2">NOTIFS FCM</div></div>
+    </div>
+    <div class="tech-pills">
+      <span class="pill">📱 React Native</span>
+      <span class="pill">⚡ Socket.io</span>
+      <span class="pill">🗺️ Google Maps</span>
+      <span class="pill">🟩 Node.js</span>
+      <span class="pill">🔥 Firebase FCM</span>
+      <span class="pill">🍃 MongoDB</span>
+    </div>
+    <div class="log-wrap">
+      <div class="log-header">
+        <span class="log-header-title">SOCKET.IO — FLUX TEMPS RÉEL</span>
+        <div class="log-hbs">
+          <span class="log-hb emit">EMIT</span>
+          <span class="log-hb recv">RECV</span>
+        </div>
+      </div>
+      <div class="log-body" id="socketLog"></div>
+    </div>
+  </div>
+
+  <!-- PHONE -->
+  <div class="demo-wrap">
+    <div class="phone-outer">
+      <div class="float-b1">🚌 DDD 42 — 2min<br><span style="font-weight:400;opacity:.7">Arrêt Colobane</span></div>
+      <div class="float-b2">📡 GPS sync<br><span style="opacity:.6">lat:14.6937 lng:-17.4478</span></div>
+      <div class="float-b3">✅ MongoDB write OK</div>
+      <div class="phone-frame">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="app-topbar">
+            <div class="app-name">🚌 DakarGo</div>
+            <div class="live-ind"><span class="live-dot"></span>Live</div>
+          </div>
+          <div class="app-tabs">
+            <button class="tab-btn active" id="tbtn-map" onclick="switchTab('map',this)">🗺️ Carte</button>
+            <button class="tab-btn" id="tbtn-search" onclick="switchTab('search',this)">🔍 Trajet</button>
+            <button class="tab-btn" id="tbtn-alerts" onclick="switchTab('alerts',this)">🔔 Alertes</button>
+            <button class="tab-btn" id="tbtn-favs" onclick="switchTab('favs',this)">⭐ Favoris</button>
+          </div>
+
+          <!-- MAP TAB -->
+          <div class="map-view active" id="tab-map">
+            <div class="map-canvas">
+              <div class="map-grid"></div>
+              <div class="road road-h main-h" style="top:30%;left:0;right:0"></div>
+              <div class="road road-h main-h" style="top:56%;left:0;right:0"></div>
+              <div class="road road-h" style="top:72%;left:0;right:0"></div>
+              <div class="road road-v main-v" style="left:22%;top:0;bottom:0"></div>
+              <div class="road road-v main-v" style="left:52%;top:0;bottom:0"></div>
+              <div class="road road-v" style="left:78%;top:0;bottom:0"></div>
+              <div class="rline l42"></div>
+              <div class="rline l7"></div>
+              <div class="rline l1"></div>
+              <!-- DDD 42 stops -->
+              <div class="snode" style="left:10%;top:30%"><div class="sdot here"></div><div class="stip">Petersen</div></div>
+              <div class="snode" style="left:22%;top:30%"><div class="sdot"></div><div class="stip">Tilène</div></div>
+              <div class="snode" style="left:36%;top:30%"><div class="sdot"></div><div class="stip">Colobane</div></div>
+              <div class="snode" style="left:52%;top:30%"><div class="sdot"></div><div class="stip">HLM</div></div>
+              <div class="snode" style="left:68%;top:30%"><div class="sdot"></div><div class="stip">Liberté 5</div></div>
+              <div class="snode" style="left:82%;top:30%"><div class="sdot"></div><div class="stip">Liberté 6</div></div>
+              <!-- DDD 7 stops -->
+              <div class="snode" style="left:22%;top:56%"><div class="sdot" style="border-color:var(--accent2)"></div><div class="stip">Colobane</div></div>
+              <div class="snode" style="left:52%;top:56%"><div class="sdot" style="border-color:var(--accent2)"></div><div class="stip">Liberté 5</div></div>
+              <div class="snode" style="left:80%;top:56%"><div class="sdot" style="border-color:var(--accent2)"></div><div class="stip">Almadies</div></div>
+              <!-- Bus markers -->
+              <div class="bpin" id="bus1" style="left:42%;top:30%"><div class="bpin-lbl">DDD 42</div><div class="bpin-ico lg">🚌</div></div>
+              <div class="bpin" id="bus2" style="left:64%;top:30%"><div class="bpin-lbl">DDD 42b</div><div class="bpin-ico md">🚌</div></div>
+              <div class="bpin" id="bus3" style="left:38%;top:56%"><div class="bpin-lbl">DDD 7</div><div class="bpin-ico sm">🚌</div></div>
+              <div class="bpin" id="bus4" style="left:22%;top:35%"><div class="bpin-lbl">DDD 1</div><div class="bpin-ico sm" style="background:var(--purple);box-shadow:0 0 10px rgba(167,139,250,.5)">🚌</div></div>
+              <div class="map-cluster">7 bus actifs</div>
+              <!-- Info card -->
+              <div class="map-card">
+                <div class="brow"><span class="bbadge">DDD 42</span><span class="broute">Petersen → Liberté 6</span><span class="beta" id="eta-val">~2min</span></div>
+                <div class="ptrack">
+                  <div class="ps d"></div><div class="pl d"></div><div class="ps d"></div><div class="pl d"></div>
+                  <div class="ps h"></div><div class="pl"></div><div class="ps"></div><div class="pl"></div><div class="ps"></div><div class="pl"></div><div class="ps"></div>
+                </div>
+                <div class="bfoot">
+                  <span class="bfl">Prochain</span><span class="bfv" id="next-bus-time">8min</span>
+                  <span class="bfl">Affluence</span>
+                  <div class="occ"><div class="ocs f"></div><div class="ocs f"></div><div class="ocs f"></div><div class="ocs x"></div><div class="ocs"></div></div>
+                  <span class="bfl" id="speed-val">32km/h</span>
+                </div>
+              </div>
+              <!-- Push notif -->
+              <div class="push-notif" id="push-notif" style="display:none">
+                <div class="pn-top"><span class="pn-app">🔔 DakarGo</span><span class="pn-time">maintenant</span></div>
+                <div class="pn-title" id="pn-title">DDD 42 dans 2 minutes</div>
+                <div class="pn-body" id="pn-body">Arrêt Colobane — montez vite !</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SEARCH TAB -->
+          <div class="search-view" id="tab-search">
+            <div class="sbox" style="margin-bottom:.3rem"><span class="sico">📍</span><input type="text" value="Petersen" readonly></div>
+            <div class="sbox"><span class="sico">🎯</span><input type="text" placeholder="Destination…" value="Liberté 6"></div>
+            <div class="rr-wrap" id="route-results"></div>
+          </div>
+
+          <!-- ALERTS TAB -->
+          <div class="alerts-view" id="tab-alerts">
+            <div class="av-head"><span>Alertes actives</span><span class="av-hb" id="alert-badge">3 nouvelles</span></div>
+            <div class="alist" id="alert-list"></div>
+          </div>
+
+          <!-- FAVS TAB -->
+          <div class="favs-view" id="tab-favs">
+            <div class="flist" id="fav-list"></div>
+          </div>
+
+          <div class="bnav">
+            <button class="bni active" onclick="switchTab('map',document.getElementById('tbtn-map'))"><span class="bni-ico">🗺️</span><span class="bni-lbl">CARTE</span></button>
+            <button class="bni" onclick="switchTab('search',document.getElementById('tbtn-search'))"><span class="bni-ico">🔍</span><span class="bni-lbl">TRAJET</span></button>
+            <button class="bni" onclick="switchTab('alerts',document.getElementById('tbtn-alerts'))"><span class="bni-ico">🔔</span><span class="bni-lbl">ALERTES</span></button>
+            <button class="bni" onclick="switchTab('favs',document.getElementById('tbtn-favs'))"><span class="bni-ico">⭐</span><span class="bni-lbl">FAVORIS</span></button>
+            <button class="bni" onclick="switchTab('profile',null)"><span class="bni-ico">👤</span><span class="bni-lbl">PROFIL</span></button>
+          </div>
+
+          <!-- PROFILE TAB -->
+          <div class="profile-view" id="tab-profile">
+            <div class="prof-header">
+              <div class="prof-avatar">👤</div>
+              <div>
+                <div class="prof-name">Cheikh T. Mbow</div>
+                <div style="display:flex;align-items:center;gap:5px;margin-top:2px">
+                  <div class="prof-sub">Dakar, Sénégal</div>
+                  <span class="prof-badge">Bêta</span>
+                </div>
+              </div>
+            </div>
+            <div class="prof-body">
+              <div class="prof-section">
+                <div class="prof-sec-title">MES LIGNES SUIVIES</div>
+                <div class="prof-row"><span class="prof-row-ico">🚌</span><span class="prof-row-label">DDD 42 — Petersen→Lib 6</span><span class="prof-row-val">Actif</span></div>
+                <div class="prof-row"><span class="prof-row-ico">🚌</span><span class="prof-row-label">DDD 7 — Lib 6→Rufisque</span><span class="prof-row-val">Actif</span></div>
+                <div class="prof-row" style="color:var(--muted)"><span class="prof-row-ico">➕</span><span class="prof-row-label" style="color:var(--accent)">Ajouter une ligne</span></div>
+              </div>
+              <div class="prof-section">
+                <div class="prof-sec-title">NOTIFICATIONS</div>
+                <div class="prof-row"><span class="prof-row-ico">🔔</span><span class="prof-row-label">Alertes de passage</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+                <div class="prof-row"><span class="prof-row-ico">⏰</span><span class="prof-row-label">Rappel 10 min avant</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+                <div class="prof-row"><span class="prof-row-ico">📡</span><span class="prof-row-label">Mode hors-ligne auto</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+                <div class="prof-row"><span class="prof-row-ico">🌙</span><span class="prof-row-label">Thème sombre</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+              </div>
+              <div class="prof-section">
+                <div class="prof-sec-title">STATISTIQUES</div>
+                <div class="prof-row"><span class="prof-row-ico">📍</span><span class="prof-row-label">Trajets ce mois</span><span class="prof-row-val">48</span><span class="prof-row-arr">›</span></div>
+                <div class="prof-row"><span class="prof-row-ico">⏱️</span><span class="prof-row-label">Temps économisé</span><span class="prof-row-val">~6h20</span><span class="prof-row-arr">›</span></div>
+                <div class="prof-row"><span class="prof-row-ico">⭐</span><span class="prof-row-label">Arrêts favoris</span><span class="prof-row-val">4</span><span class="prof-row-arr">›</span></div>
+              </div>
+              <div class="prof-section">
+                <div class="prof-sec-title">À PROPOS</div>
+                <div class="prof-row"><span class="prof-row-ico">ℹ️</span><span class="prof-row-label">Version app</span><span class="prof-row-val">0.8.2 bêta</span></div>
+                <div class="prof-row"><span class="prof-row-ico">📝</span><span class="prof-row-label">Donner mon avis</span><span class="prof-row-arr">›</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DASHBOARD -->
+<section class="section">
+  <div class="sec-label fade-up">Tableau de bord temps réel</div>
+  <div class="sec-title fade-up">Métriques Socket.io — Live</div>
+  <div class="rt-grid">
+    <div class="rt-card fade-up"><div class="rt-card-lbl">BUS EN SERVICE</div><div class="rt-card-val" id="rt-bus">7</div><div class="rt-card-sub">sur 24 lignes · <span class="up">↑ 2</span> vs hier</div></div>
+    <div class="rt-card fade-up"><div class="rt-card-lbl">MAJ GPS / MINUTE</div><div class="rt-card-val" id="rt-gps">192</div><div class="rt-card-sub">toutes les 5s par bus · <span class="up">stable</span></div></div>
+    <div class="rt-card fade-up"><div class="rt-card-lbl">UTILISATEURS ACTIFS</div><div class="rt-card-val" id="rt-users">284</div><div class="rt-card-sub">sessions ouvertes · <span class="up">↑ 18%</span></div></div>
+    <div class="rt-card fade-up"><div class="rt-card-lbl">LATENCE SOCKET.IO</div><div class="rt-card-val" id="rt-lat">18ms</div><div class="rt-card-sub">p50 · p95 : <span style="color:var(--accent)" id="rt-p95">42ms</span></div></div>
+  </div>
+  <div class="chart-wrap fade-up">
+    <div class="chart-title"><span>Mises à jour GPS — dernières 30 secondes</span><span style="color:var(--accent)" id="chart-total">0 total</span></div>
+    <div class="chart-canvas"><div class="chart-baseline"></div><div class="chart-bars" id="chartBars"></div></div>
+  </div>
+  <div class="fcm-demo fade-up">
+    <div class="fcm-demo-title">🔥 FIREBASE FCM — NOTIFICATIONS PUSH SIMULÉES</div>
+    <div class="fcm-phones" id="fcm-phones"></div>
+  </div>
+</section>
+
+<!-- BACKEND -->
+<section class="section">
+  <div class="sec-label fade-up">Backend Node.js</div>
+  <div class="sec-title fade-up">API Express + MongoDB en action</div>
+  <div class="backend-grid">
+    <div class="be-panel fade-up">
+      <div class="be-title">EXPRESS — ROUTES API</div>
+      <div class="route-row"><span class="method GET">GET</span><span class="rpath">/api/lines</span><span class="rms"><span id="ms-lines">12</span>ms</span><span class="rstatus ok">200</span></div>
+      <div class="route-row"><span class="method GET">GET</span><span class="rpath">/api/buses/live</span><span class="rms"><span id="ms-buses">8</span>ms</span><span class="rstatus ok">200</span></div>
+      <div class="route-row"><span class="method POST">POST</span><span class="rpath">/api/route/plan</span><span class="rms"><span id="ms-route">34</span>ms</span><span class="rstatus ok">200</span></div>
+      <div class="route-row"><span class="method POST">POST</span><span class="rpath">/api/alerts/subscribe</span><span class="rms"><span id="ms-alert">6</span>ms</span><span class="rstatus ok">201</span></div>
+      <div class="route-row"><span class="method WS">WS</span><span class="rpath">socket.on('gps:update')</span><span class="rms">~5s</span><span class="rstatus live">LIVE</span></div>
+      <div class="route-row"><span class="method WS">WS</span><span class="rpath">socket.on('alert:passage')</span><span class="rms">push</span><span class="rstatus live">LIVE</span></div>
+      <div class="route-row" style="border:none"><span class="method GET">GET</span><span class="rpath">/api/stops/:lineId</span><span class="rms"><span id="ms-stops">11</span>ms</span><span class="rstatus ok">200</span></div>
+    </div>
+    <div class="be-panel fade-up">
+      <div class="be-title">MONGODB — DOCUMENT LIVE</div>
+      <div class="mongo-doc">
+        <div><span class="mj-muted">{</span></div>
+        <div>&nbsp;&nbsp;<span class="mj-key">"_id"</span>: <span class="mj-str">"bus_ddd42_003"</span>,</div>
+        <div>&nbsp;&nbsp;<span class="mj-key">"line"</span>: <span class="mj-str">"DDD 42"</span>,</div>
+        <div>&nbsp;&nbsp;<span class="mj-key">"position"</span>: { <span class="mj-key">"lat"</span>: <span class="mj-num" id="doc-lat">14.6937</span>, <span class="mj-key">"lng"</span>: <span class="mj-num" id="doc-lng">-17.4478</span> },</div>
+        <div>&nbsp;&nbsp;<span class="mj-key">"speed"</span>: <span class="mj-num" id="doc-speed">32</span> <span class="mj-muted">// km/h</span>,</div>
+        <div>&nbsp;&nbsp;<span class="mj-key">"occupancy"</span>: <span class="mj-num" id="doc-occ">78</span> <span class="mj-muted">// %</span>,</div>
+        <div>&nbsp;&nbsp;<span class="mj-key">"nextStop"</span>: <span class="mj-str" id="doc-stop">"Colobane"</span>,</div>
+        <div>&nbsp;&nbsp;<span class="mj-key">"etaMin"</span>: <span class="mj-num" id="doc-eta">2</span>,</div>
+        <div>&nbsp;&nbsp;<span class="mj-key">"active"</span>: <span class="mj-bool">true</span>,</div>
+        <div>&nbsp;&nbsp;<span class="mj-key">"updatedAt"</span>: <span class="mj-str" id="doc-ts">"…"</span></div>
+        <div><span class="mj-muted">}</span></div>
+      </div>
+      <div style="font-size:9px;color:var(--muted)">Collection <span style="color:var(--accent)">buses</span> · Mise à jour toutes les 5s via Socket.io → MongoDB</div>
+    </div>
+  </div>
+</section>
+
+<!-- ARCHITECTURE -->
+<section class="section">
+  <div class="sec-label fade-up">Architecture</div>
+  <div class="sec-title fade-up">Stack technique — flux de données</div>
+  <div class="arch-grid fade-up">
+    <div class="arch-col">
+      <div class="abox hl"><span class="ab-ico">📱</span><div class="abt">React Native App</div><div class="abs">iOS &amp; Android · Expo SDK</div></div>
+      <div class="abox"><span class="ab-ico">🗺️</span><div class="abt">Google Maps SDK</div><div class="abs">Carte, markers, Directions API</div></div>
+      <div class="abox"><span class="ab-ico">🔥</span><div class="abt">Firebase FCM</div><div class="abs">Push notifications iOS/Android</div></div>
+      <div class="abox"><span class="ab-ico">💾</span><div class="abt">AsyncStorage</div><div class="abs">Cache hors-ligne lignes &amp; horaires</div></div>
+    </div>
+    <div class="arch-mid">
+      <div class="amid-ico">⚡</div>
+      <div class="amid-lbl">SOCKET.IO</div>
+      <div class="data-flow"></div>
+      <div style="color:rgba(34,211,238,.3);text-align:center;font-size:14px">⇌</div>
+      <div class="data-flow" style="background:linear-gradient(0deg,var(--accent),transparent)"></div>
+      <div class="amid-ico">📡</div>
+      <div class="amid-lbl">REST API</div>
+    </div>
+    <div class="arch-col">
+      <div class="abox hl"><span class="ab-ico">🟩</span><div class="abt">Node.js + Express</div><div class="abs">API REST &amp; serveur Socket.io</div></div>
+      <div class="abox"><span class="ab-ico">🍃</span><div class="abt">MongoDB Atlas</div><div class="abs">Buses, stops, users, history</div></div>
+      <div class="abox"><span class="ab-ico">📍</span><div class="abt">GPS Tracker Service</div><div class="abs">Données bus toutes les 5s</div></div>
+      <div class="abox"><span class="ab-ico">☁️</span><div class="abt">Render / Railway</div><div class="abs">Déploiement cloud Node.js</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- DAKAR MAP SVG -->
+<section class="section">
+  <div class="sec-label fade-up">Réseau DDD</div>
+  <div class="sec-title fade-up">Carte schématique des lignes couvertes</div>
+  <div class="dakar-wrap fade-up" style="height:280px">
+    <div class="dm-title">Dakar Dem Dikk — Lignes</div>
+    <div class="dm-overlay">
+      <div class="dm-leg">
+        <div class="dm-lr"><div class="dm-ld" style="background:var(--accent)"></div><span style="color:var(--accent)">DDD 42</span></div>
+        <div class="dm-lr"><div class="dm-ld" style="background:var(--accent2)"></div><span style="color:var(--accent2)">DDD 7</span></div>
+        <div class="dm-lr"><div class="dm-ld" style="background:var(--green)"></div><span style="color:var(--green)">DDD 1</span></div>
+        <div class="dm-lr"><div class="dm-ld" style="background:var(--purple);border:1px dashed rgba(167,139,250,.4)"></div><span style="color:var(--purple)">DDD 12</span></div>
+      </div>
+    </div>
+    <svg width="100%" height="100%" viewBox="0 0 800 260" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="glow"><feGaussianBlur stdDeviation="2.5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <rect width="800" height="260" fill="#040e1c"/>
+      <!-- Grid -->
+      <g stroke="rgba(34,211,238,0.025)" stroke-width="1">
+        <line x1="0" y1="40" x2="800" y2="40"/><line x1="0" y1="80" x2="800" y2="80"/><line x1="0" y1="120" x2="800" y2="120"/><line x1="0" y1="160" x2="800" y2="160"/><line x1="0" y1="200" x2="800" y2="200"/><line x1="0" y1="240" x2="800" y2="240"/>
+        <line x1="100" y1="0" x2="100" y2="260"/><line x1="200" y1="0" x2="200" y2="260"/><line x1="300" y1="0" x2="300" y2="260"/><line x1="400" y1="0" x2="400" y2="260"/><line x1="500" y1="0" x2="500" y2="260"/><line x1="600" y1="0" x2="600" y2="260"/><line x1="700" y1="0" x2="700" y2="260"/>
+      </g>
+      <!-- Streets -->
+      <g stroke="rgba(255,255,255,0.06)" stroke-width="2" fill="none">
+        <line x1="0" y1="80" x2="800" y2="80"/><line x1="0" y1="160" x2="800" y2="160"/><line x1="200" y1="0" x2="200" y2="260"/><line x1="500" y1="0" x2="500" y2="260"/>
+      </g>
+      <g stroke="rgba(255,255,255,0.12)" stroke-width="3" fill="none">
+        <line x1="0" y1="120" x2="800" y2="120"/><line x1="350" y1="0" x2="350" y2="260"/>
+      </g>
+      <!-- DDD 42 -->
+      <polyline points="60,120 200,120 350,120 500,120 650,120 740,120" stroke="#22D3EE" stroke-width="3.5" fill="none" filter="url(#glow)" stroke-linecap="round"/>
+      <!-- DDD 7 -->
+      <polyline points="200,80 350,80 500,95 660,108 760,113" stroke="#0EA5E9" stroke-width="3" fill="none" filter="url(#glow)" stroke-linecap="round"/>
+      <!-- DDD 1 -->
+      <polyline points="350,20 350,80 350,120 350,180 350,240" stroke="#4ADE80" stroke-width="3" fill="none" filter="url(#glow)" stroke-linecap="round"/>
+      <!-- DDD 12 -->
+      <polyline points="60,160 200,155 350,140 500,128 650,122 750,120" stroke="#A78BFA" stroke-width="2.5" fill="none" stroke-dasharray="7,4" stroke-linecap="round"/>
+      <!-- Stops DDD 42 -->
+      <g fill="#22D3EE" filter="url(#glow)">
+        <circle cx="60" cy="120" r="5"/><circle cx="200" cy="120" r="5"/>
+        <circle cx="350" cy="120" r="8" stroke="white" stroke-width="2"/>
+        <circle cx="500" cy="120" r="5"/><circle cx="650" cy="120" r="5"/><circle cx="740" cy="120" r="5"/>
+      </g>
+      <!-- Stop labels -->
+      <g fill="rgba(226,232,240,0.45)" font-size="10" font-family="JetBrains Mono, monospace">
+        <text x="44" y="138">Petersen</text><text x="182" y="138">Tilène</text><text x="325" y="138">Colobane</text>
+        <text x="482" y="138">HLM</text><text x="630" y="138">Lib 5</text><text x="720" y="138">Lib 6</text>
+      </g>
+      <!-- Stops other lines -->
+      <g fill="#0EA5E9"><circle cx="200" cy="80" r="4"/><circle cx="500" cy="95" r="4"/><circle cx="660" cy="108" r="4"/></g>
+      <g fill="#4ADE80"><circle cx="350" cy="25" r="4"/><circle cx="350" cy="80" r="4"/><circle cx="350" cy="180" r="4"/><circle cx="350" cy="238" r="4"/></g>
+      <!-- Zone labels -->
+      <text x="28" y="18" fill="rgba(255,255,255,0.14)" font-size="9" font-family="JetBrains Mono, monospace">PLATEAU</text>
+      <text x="660" y="18" fill="rgba(255,255,255,0.14)" font-size="9" font-family="JetBrains Mono, monospace">LIBERTÉ</text>
+      <text x="28" y="252" fill="rgba(255,255,255,0.14)" font-size="9" font-family="JetBrains Mono, monospace">MÉDINA</text>
+      <text x="635" y="252" fill="rgba(255,255,255,0.14)" font-size="9" font-family="JetBrains Mono, monospace">GUÉDIAWAYE</text>
+      <!-- Animated buses -->
+      <g><circle r="9" fill="#22D3EE" filter="url(#glow)"/><text x="-5" y="4" font-size="10">🚌</text><animateMotion dur="12s" repeatCount="indefinite" path="M60,120 L740,120"/></g>
+      <g><circle r="7" fill="#0EA5E9" filter="url(#glow)"/><text x="-4" y="3" font-size="9">🚌</text><animateMotion dur="10s" repeatCount="indefinite" begin="-4s" path="M200,80 L760,113"/></g>
+      <g><circle r="7" fill="#4ADE80" filter="url(#glow)"/><text x="-4" y="3" font-size="9">🚌</text><animateMotion dur="8s" repeatCount="indefinite" begin="-2s" path="M350,20 L350,240"/></g>
+    </svg>
+  </div>
+</section>
+
+<!-- LIGNES -->
+<section class="section">
+  <div class="sec-label fade-up">Lignes couvertes</div>
+  <div class="sec-title fade-up">Dakar Dem Dikk — en temps réel</div>
+  <div class="lines-grid">
+    <div class="lcard fade-up"><div class="lnum">DDD 1</div><div class="lname">Dakar Plateau → Guédiawaye</div><div class="lstops">28 arrêts</div><div class="lstat ok">● En service</div></div>
+    <div class="lcard fade-up"><div class="lnum">DDD 7</div><div class="lname">Liberté 6 → Rufisque</div><div class="lstops">34 arrêts</div><div class="lstat delay">● Retard ~4min</div></div>
+    <div class="lcard fade-up"><div class="lnum">DDD 42</div><div class="lname">Petersen → Liberté 6</div><div class="lstops">18 arrêts</div><div class="lstat ok">● En service</div></div>
+    <div class="lcard fade-up"><div class="lnum">DDD 12</div><div class="lname">Plateau → Almadies</div><div class="lstops">22 arrêts</div><div class="lstat ok">● En service</div></div>
+    <div class="lcard fade-up"><div class="lnum">DDD 15</div><div class="lname">Médina → Parcelles</div><div class="lstops">26 arrêts</div><div class="lstat delay">● Retard ~2min</div></div>
+    <div class="lcard fade-up"><div class="lnum">DDD 23</div><div class="lname">Colobane → Pikine</div><div class="lstops">30 arrêts</div><div class="lstat ok">● En service</div></div>
+    <div class="lcard fade-up"><div class="lnum">DDD 8</div><div class="lname">Liberté → Yoff</div><div class="lstops">16 arrêts</div><div class="lstat ok">● En service</div></div>
+    <div class="lcard fade-up"><div class="lnum">+17</div><div class="lname">Autres lignes DDD</div><div class="lstops">en cours…</div><div class="lstat soon">● Bientôt</div></div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section">
+  <div class="sec-label fade-up">Fonctionnalités</div>
+  <div class="sec-title fade-up">Naviguer à Dakar, enfin simplement</div>
+  <div class="feat-grid">
+    <div class="fgitem fade-up"><span class="fgico">📍</span><div class="fgt">Suivi GPS temps réel</div><div class="fgd">Position mise à jour toutes les 5s via Socket.io. Carte Google Maps avec markers animés et ETA dynamique par arrêt.</div><span class="fgtag">SOCKET.IO</span></div>
+    <div class="fgitem fade-up"><span class="fgico">🗺️</span><div class="fgt">Planificateur de trajet</div><div class="fgd">Calcul du meilleur itinéraire multi-lignes via Google Directions API. Correspondances, ETA et horaires en direct.</div><span class="fgtag">MAPS API</span></div>
+    <div class="fgitem fade-up"><span class="fgico">🔔</span><div class="fgt">Alertes de passage</div><div class="fgd">Notifications push Firebase FCM déclenchées par le backend Node.js quand un bus approche votre arrêt favori.</div><span class="fgtag">FIREBASE FCM</span></div>
+    <div class="fgitem fade-up"><span class="fgico">⭐</span><div class="fgt">Favoris & Historique</div><div class="fgd">Arrêts et trajets sauvegardés dans MongoDB. Historique 30 jours et suggestions basées sur vos habitudes.</div><span class="fgtag">MONGODB</span></div>
+    <div class="fgitem fade-up"><span class="fgico">📡</span><div class="fgt">Mode hors-ligne</div><div class="fgd">Horaires et plans mis en cache via AsyncStorage pour les lignes favorites. Idéal en zone à faible signal à Dakar.</div><span class="fgtag">ASYNCSTORAGE</span></div>
+    <div class="fgitem fade-up"><span class="fgico">📊</span><div class="fgt">Affluence & Confort</div><div class="fgd">Indicateurs de remplissage calculés par le backend Node.js depuis les données historiques MongoDB.</div><span class="fgtag">NODE.JS</span></div>
+  </div>
+</section>
+
+<!-- ══════════════════ CODE SNIPPETS ══════════════════ -->
+<section class="section">
+  <div class="sec-label fade-up">Code source</div>
+  <div class="sec-title fade-up">Extraits clés — React Native & Node.js</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem">
+    <!-- Code tabs left -->
+    <div class="fade-up">
+      <div style="display:flex;gap:0;border:1px solid var(--border);border-bottom:none">
+        <button class="code-tab active" onclick="showCode('rn','socket')" id="ct-socket">socket.js</button>
+        <button class="code-tab" onclick="showCode('rn','map')" id="ct-map">MapScreen.jsx</button>
+        <button class="code-tab" onclick="showCode('rn','notif')" id="ct-notif">notifications.js</button>
+      </div>
+      <div class="code-block" id="code-socket"><pre><span class="ck">import</span> io <span class="ck">from</span> <span class="cs">'socket.io-client'</span>;
+<span class="ck">import</span> { SERVER_URL } <span class="ck">from</span> <span class="cs">'../config'</span>;
+
+<span class="ck">let</span> socket;
+
+<span class="ck">export const</span> <span class="cf">initSocket</span> = () =&gt; {
+  socket = <span class="cf">io</span>(SERVER_URL, {
+    transports: [<span class="cs">'websocket'</span>],
+    reconnection: <span class="cb">true</span>,
+    reconnectionDelay: <span class="cn">1000</span>,
+  });
+
+  socket.<span class="cf">on</span>(<span class="cs">'connect'</span>, () =&gt; {
+    console.<span class="cf">log</span>(<span class="cs">'✅ Socket connecté'</span>);
+    socket.<span class="cf">emit</span>(<span class="cs">'subscribe:line'</span>, [<span class="cs">'DDD 42'</span>, <span class="cs">'DDD 7'</span>]);
+  });
+
+  socket.<span class="cf">on</span>(<span class="cs">'gps:update'</span>, (data) =&gt; {
+    <span class="cm">// Met à jour la position du bus sur la carte</span>
+    store.<span class="cf">dispatch</span>(updateBusPosition(data));
+  });
+
+  socket.<span class="cf">on</span>(<span class="cs">'alert:passage'</span>, (alert) =&gt; {
+    <span class="cf">scheduleLocalNotification</span>(alert);
+  });
+};
+
+<span class="ck">export const</span> <span class="cf">getSocket</span> = () =&gt; socket;</pre></div>
+      <div class="code-block" id="code-map" style="display:none"><pre><span class="ck">import</span> MapView, { Marker, Polyline } <span class="ck">from</span> <span class="cs">'react-native-maps'</span>;
+<span class="ck">import</span> { useSelector } <span class="ck">from</span> <span class="cs">'react-redux'</span>;
+
+<span class="ck">export default function</span> <span class="cf">MapScreen</span>() {
+  <span class="ck">const</span> buses = <span class="cf">useSelector</span>(s =&gt; s.buses.live);
+  <span class="ck">const</span> route = <span class="cf">useSelector</span>(s =&gt; s.route.active);
+
+  <span class="ck">return</span> (
+    &lt;<span class="ct">MapView</span>
+      provider=<span class="cs">"google"</span>
+      initialRegion=<span class="cm">{{</span>
+        latitude: <span class="cn">14.6937</span>, longitude: <span class="cn">-17.4441</span>,
+        latitudeDelta: <span class="cn">0.05</span>, longitudeDelta: <span class="cn">0.05</span>,
+      <span class="cm">}}</span>&gt;
+      {buses.<span class="cf">map</span>(bus =&gt; (
+        &lt;<span class="ct">Marker</span>
+          key={bus._id}
+          coordinate={bus.position}
+          title={bus.line}
+          description={<span class="cs">`ETA: ${bus.etaMin}min`</span>}
+        /&gt;
+      ))}
+      {route &amp;&amp; (
+        &lt;<span class="ct">Polyline</span>
+          coordinates={route.coords}
+          strokeColor=<span class="cs">"#22D3EE"</span>
+          strokeWidth=<span class="cn">{3}</span>
+        /&gt;
+      )}
+    &lt;/<span class="ct">MapView</span>&gt;
+  );
+}</pre></div>
+      <div class="code-block" id="code-notif" style="display:none"><pre><span class="ck">import</span> messaging <span class="ck">from</span> <span class="cs">'@react-native-firebase/messaging'</span>;
+<span class="ck">import</span> notifee <span class="ck">from</span> <span class="cs">'@notifee/react-native'</span>;
+
+<span class="ck">export const</span> <span class="cf">setupFCM</span> = <span class="ck">async</span> () =&gt; {
+  <span class="ck">const</span> token = <span class="ck">await</span> messaging().<span class="cf">getToken</span>();
+  <span class="cm">// Envoyer token au backend Node.js</span>
+  <span class="ck">await</span> <span class="cf">fetch</span>(<span class="cs">`${API}/users/fcm-token`</span>, {
+    method: <span class="cs">'POST'</span>,
+    body: JSON.<span class="cf">stringify</span>({ token, stops: userFavStops }),
+  });
+
+  messaging().<span class="cf">onMessage</span>(<span class="ck">async</span> msg =&gt; {
+    <span class="ck">const</span> channel = <span class="ck">await</span> notifee.<span class="cf">createChannel</span>({
+      id: <span class="cs">'bus-alerts'</span>, name: <span class="cs">'Alertes Bus'</span>,
+    });
+    <span class="ck">await</span> notifee.<span class="cf">displayNotification</span>({
+      title: msg.notification.title,
+      body: msg.notification.body,
+      android: { channelId: channel },
+    });
+  });
+};</pre></div>
+    </div>
+
+    <!-- Code tabs right -->
+    <div class="fade-up">
+      <div style="display:flex;gap:0;border:1px solid var(--border);border-bottom:none">
+        <button class="code-tab active" onclick="showCode('be','server')" id="ct-server">server.js</button>
+        <button class="code-tab" onclick="showCode('be','gps')" id="ct-gps">gpsService.js</button>
+        <button class="code-tab" onclick="showCode('be','fcm')" id="ct-fcm">fcmService.js</button>
+      </div>
+      <div class="code-block" id="code-server"><pre><span class="ck">const</span> express = <span class="cf">require</span>(<span class="cs">'express'</span>);
+<span class="ck">const</span> { Server } = <span class="cf">require</span>(<span class="cs">'socket.io'</span>);
+<span class="ck">const</span> mongoose = <span class="cf">require</span>(<span class="cs">'mongoose'</span>);
+
+<span class="ck">const</span> app = <span class="cf">express</span>();
+<span class="ck">const</span> httpServer = <span class="cf">createServer</span>(app);
+<span class="ck">const</span> io = <span class="ck">new</span> <span class="cf">Server</span>(httpServer, {
+  cors: { origin: <span class="cs">'*'</span> },
+});
+
+<span class="cm">// Routes REST</span>
+app.<span class="cf">use</span>(<span class="cs">'/api/lines'</span>, linesRouter);
+app.<span class="cf">use</span>(<span class="cs">'/api/buses'</span>, busesRouter);
+app.<span class="cf">use</span>(<span class="cs">'/api/route'</span>, routeRouter);
+app.<span class="cf">use</span>(<span class="cs">'/api/alerts'</span>, alertsRouter);
+
+<span class="cm">// Socket.io namespace</span>
+io.<span class="cf">on</span>(<span class="cs">'connection'</span>, socket =&gt; {
+  console.<span class="cf">log</span>(<span class="cs">`Client connecté: ${socket.id}`</span>);
+
+  socket.<span class="cf">on</span>(<span class="cs">'subscribe:line'</span>, lines =&gt; {
+    lines.<span class="cf">forEach</span>(l =&gt; socket.<span class="cf">join</span>(<span class="cs">`line:${l}`</span>));
+  });
+
+  socket.<span class="cf">on</span>(<span class="cs">'disconnect'</span>, () =&gt; {
+    console.<span class="cf">log</span>(<span class="cs">`Client déconnecté: ${socket.id}`</span>);
+  });
+});</pre></div>
+      <div class="code-block" id="code-gps" style="display:none"><pre><span class="ck">const</span> Bus = <span class="cf">require</span>(<span class="cs">'../models/Bus'</span>);
+<span class="ck">const</span> { io } = <span class="cf">require</span>(<span class="cs">'../server'</span>);
+<span class="ck">const</span> { <span class="cf">checkAlerts</span> } = <span class="cf">require</span>(<span class="cs">'./fcmService'</span>);
+
+<span class="cm">// Polling GPS toutes les 5 secondes</span>
+<span class="cf">setInterval</span>(<span class="ck">async</span> () =&gt; {
+  <span class="ck">const</span> buses = <span class="ck">await</span> Bus.<span class="cf">find</span>({ active: <span class="cb">true</span> });
+
+  <span class="ck">for</span> (<span class="ck">const</span> bus <span class="ck">of</span> buses) {
+    <span class="ck">const</span> gpsData = <span class="ck">await</span> <span class="cf">fetchTrackerAPI</span>(bus.trackerId);
+
+    <span class="cm">// Mise à jour MongoDB</span>
+    <span class="ck">await</span> Bus.<span class="cf">updateOne</span>({ _id: bus._id }, {
+      position: gpsData.coords,
+      speed: gpsData.speed,
+      updatedAt: <span class="ck">new</span> <span class="cf">Date</span>(),
+    });
+
+    <span class="cm">// Broadcast Socket.io par ligne</span>
+    io.<span class="cf">to</span>(<span class="cs">`line:${bus.line}`</span>).<span class="cf">emit</span>(<span class="cs">'gps:update'</span>, {
+      busId: bus._id, line: bus.line,
+      position: gpsData.coords,
+      speed: gpsData.speed,
+    });
+
+    <span class="cm">// Vérifier alertes de passage</span>
+    <span class="ck">await</span> <span class="cf">checkAlerts</span>(bus, gpsData);
+  }
+}, <span class="cn">5000</span>);</pre></div>
+      <div class="code-block" id="code-fcm" style="display:none"><pre><span class="ck">const</span> admin = <span class="cf">require</span>(<span class="cs">'firebase-admin'</span>);
+<span class="ck">const</span> User = <span class="cf">require</span>(<span class="cs">'../models/User'</span>);
+
+<span class="ck">exports</span>.<span class="cf">checkAlerts</span> = <span class="ck">async</span> (bus, gps) =&gt; {
+  <span class="ck">const</span> stops = bus.upcomingStops;
+
+  <span class="ck">for</span> (<span class="ck">const</span> stop <span class="ck">of</span> stops) {
+    <span class="ck">const</span> dist = <span class="cf">haversine</span>(gps.coords, stop.coords);
+    <span class="ck">const</span> etaMin = Math.<span class="cf">round</span>(dist / (bus.speed / <span class="cn">60</span>));
+
+    <span class="cm">// Trouver utilisateurs abonnés à cet arrêt</span>
+    <span class="ck">const</span> users = <span class="ck">await</span> User.<span class="cf">find</span>({
+      <span class="cs">'alerts.stop'</span>: stop._id,
+      <span class="cs">'alerts.threshold'</span>: { $gte: etaMin },
+    });
+
+    <span class="ck">if</span> (users.length &gt; <span class="cn">0</span>) {
+      <span class="ck">await</span> admin.messaging().<span class="cf">sendMulticast</span>({
+        tokens: users.<span class="cf">map</span>(u =&gt; u.fcmToken),
+        notification: {
+          title: <span class="cs">`${bus.line} dans ${etaMin} min`</span>,
+          body: <span class="cs">`Arrêt ${stop.name} — Montez vite !`</span>,
+        },
+      });
+    }
+  }
+};</pre></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ TIMELINE ══════════════════ -->
+<section class="section">
+  <div class="sec-label fade-up">Roadmap</div>
+  <div class="sec-title fade-up">Chronologie du projet</div>
+  <div class="timeline fade-up">
+    <div class="tline-track"></div>
+    <div class="titem done">
+      <div class="tnode"><div class="tnode-dot"></div></div>
+      <div class="tcard">
+        <div class="tc-date">Janvier 2024</div>
+        <div class="tc-title">Idée & Recherche</div>
+        <div class="tc-desc">Analyse du problème mobilité à Dakar. Entretiens avec 40+ usagers des transports en commun DDD.</div>
+        <div class="tc-tags"><span class="tctag">Research</span><span class="tctag">UX</span></div>
+      </div>
+    </div>
+    <div class="titem done">
+      <div class="tnode"><div class="tnode-dot"></div></div>
+      <div class="tcard">
+        <div class="tc-date">Février 2024</div>
+        <div class="tc-title">Architecture & Backend</div>
+        <div class="tc-desc">Setup Node.js + Express + Socket.io. Modélisation MongoDB. Connexion aux trackers GPS des bus DDD.</div>
+        <div class="tc-tags"><span class="tctag">Node.js</span><span class="tctag">MongoDB</span><span class="tctag">Socket.io</span></div>
+      </div>
+    </div>
+    <div class="titem done">
+      <div class="tnode"><div class="tnode-dot"></div></div>
+      <div class="tcard">
+        <div class="tc-date">Mars 2024</div>
+        <div class="tc-title">App React Native v0.1</div>
+        <div class="tc-desc">Première version mobile : carte temps réel, suivi GPS, 3 lignes DDD intégrées. Tests internes.</div>
+        <div class="tc-tags"><span class="tctag">React Native</span><span class="tctag">Google Maps</span></div>
+      </div>
+    </div>
+    <div class="titem done">
+      <div class="tnode"><div class="tnode-dot"></div></div>
+      <div class="tcard">
+        <div class="tc-date">Avril 2024</div>
+        <div class="tc-title">Notifications FCM & Favoris</div>
+        <div class="tc-desc">Intégration Firebase FCM pour les alertes de passage. Système de favoris et historique MongoDB.</div>
+        <div class="tc-tags"><span class="tctag">Firebase</span><span class="tctag">FCM</span></div>
+      </div>
+    </div>
+    <div class="titem active">
+      <div class="tnode"><div class="tnode-dot pulse"></div></div>
+      <div class="tcard">
+        <div class="tc-date">Maintenant — Bêta</div>
+        <div class="tc-title">Bêta publique — 3K+ users</div>
+        <div class="tc-desc">Application en test avec 3000+ utilisateurs. 7 lignes DDD actives. Collecte feedbacks et optimisation.</div>
+        <div class="tc-tags"><span class="tctag tctag-live">● LIVE</span><span class="tctag">3K+ Users</span></div>
+      </div>
+    </div>
+    <div class="titem upcoming">
+      <div class="tnode"><div class="tnode-dot dim"></div></div>
+      <div class="tcard dim-card">
+        <div class="tc-date">Q3 2024</div>
+        <div class="tc-title">24 lignes & Publication Store</div>
+        <div class="tc-desc">Couverture complète DDD 24 lignes. Publication App Store & Google Play. Partenariat officiel DDD.</div>
+        <div class="tc-tags"><span class="tctag">App Store</span><span class="tctag">Play Store</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ MÉTRIQUES IMPACT ══════════════════ -->
+<section class="section" style="background:linear-gradient(180deg,transparent,rgba(34,211,238,.02),transparent)">
+  <div class="sec-label fade-up">Impact</div>
+  <div class="sec-title fade-up">DakarGo en chiffres</div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:3rem">
+    <div class="impact-card fade-up">
+      <div class="ic-num" id="ic1">0</div>
+      <div class="ic-label">minutes économisées / jour par utilisateur</div>
+      <div class="ic-bar"><div class="ic-fill" style="width:72%"></div></div>
+    </div>
+    <div class="impact-card fade-up">
+      <div class="ic-num" id="ic2">0</div>
+      <div class="ic-label">utilisateurs actifs en bêta</div>
+      <div class="ic-bar"><div class="ic-fill" style="width:60%;background:var(--green)"></div></div>
+    </div>
+    <div class="impact-card fade-up">
+      <div class="ic-num" id="ic3">0</div>
+      <div class="ic-label">mises à jour GPS / jour</div>
+      <div class="ic-bar"><div class="ic-fill" style="width:88%;background:var(--purple)"></div></div>
+    </div>
+  </div>
+
+  <!-- OS Breakdown -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+    <div class="be-panel fade-up">
+      <div class="be-title">PLATEFORME UTILISATEURS</div>
+      <div style="margin-bottom:1rem">
+        <div style="display:flex;justify-content:space-between;margin-bottom:.4rem;font-size:11px"><span>Android</span><span style="color:var(--green)">68%</span></div>
+        <div style="height:6px;background:var(--border);border-radius:3px"><div style="width:68%;height:100%;background:var(--green);border-radius:3px"></div></div>
+      </div>
+      <div style="margin-bottom:1rem">
+        <div style="display:flex;justify-content:space-between;margin-bottom:.4rem;font-size:11px"><span>iOS</span><span style="color:var(--accent)">32%</span></div>
+        <div style="height:6px;background:var(--border);border-radius:3px"><div style="width:32%;height:100%;background:var(--accent);border-radius:3px"></div></div>
+      </div>
+      <div style="margin-top:1.5rem;font-size:10px;color:var(--muted)">
+        <div style="display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid var(--border)"><span>Rétention J7</span><span style="color:var(--accent)">62%</span></div>
+        <div style="display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid var(--border)"><span>Rétention J30</span><span style="color:var(--accent)">41%</span></div>
+        <div style="display:flex;justify-content:space-between;padding:.4rem 0"><span>Note moyenne</span><span style="color:var(--orange)">★ 4.3/5</span></div>
+      </div>
+    </div>
+    <div class="be-panel fade-up">
+      <div class="be-title">HEURES DE POINTE — UTILISATION</div>
+      <div class="peak-chart" id="peak-chart"></div>
+      <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--muted);margin-top:.4rem">
+        <span>06h</span><span>08h</span><span>10h</span><span>12h</span><span>14h</span><span>16h</span><span>18h</span><span>20h</span>
+      </div>
+      <div style="margin-top:1rem;font-size:10px;color:var(--muted)">
+        <div style="display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid var(--border)"><span>Pic matin</span><span style="color:var(--orange)">07h30 — 08h30</span></div>
+        <div style="display:flex;justify-content:space-between;padding:.4rem 0"><span>Pic soir</span><span style="color:var(--orange)">17h00 — 18h30</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ TÉMOIGNAGES ══════════════════ -->
+<section class="section">
+  <div class="sec-label fade-up">Retours bêta</div>
+  <div class="sec-title fade-up">Ce qu'en disent les utilisateurs</div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem">
+    <div class="testi fade-up">
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-text">« Enfin je sais exactement quand le DDD 42 arrive à Colobane. Plus d'attente à l'aveugle sous le soleil. »</div>
+      <div class="testi-author"><div class="testi-avatar">AM</div><div><div class="testi-name">Aminata M.</div><div class="testi-loc">Colobane, Dakar</div></div></div>
+    </div>
+    <div class="testi fade-up">
+      <div class="testi-stars">★★★★★</div>
+      <div class="testi-text">« Le mode hors-ligne est génial. Même quand le réseau est mauvais à Pikine, j'ai quand même les horaires. »</div>
+      <div class="testi-author"><div class="testi-avatar">MD</div><div><div class="testi-name">Moussa D.</div><div class="testi-loc">Pikine, Dakar</div></div></div>
+    </div>
+    <div class="testi fade-up">
+      <div class="testi-stars">★★★★☆</div>
+      <div class="testi-text">« Les notifications FCM sont super pratiques. Je prépare ma sortie exactement 5 minutes avant le bus. »</div>
+      <div class="testi-author"><div class="testi-avatar">FS</div><div><div class="testi-name">Fatou S.</div><div class="testi-loc">Liberté 6, Dakar</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<div class="footer-bar">
+  <div>
+    <div class="footer-logo">DakarGo</div>
+    <div class="footer-stack">React Native · Socket.io · Node.js + Express · Firebase FCM · MongoDB · Google Maps API</div>
+  </div>
+  <div class="footer-credit">Projet de <span>Cheikh Tidiane Mbow</span> — Dakar 2024</div>
+</div>
+
+<script>
+/* CURSOR */
+const cur=document.getElementById('cursor'),ring=document.getElementById('ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx-5+'px';cur.style.top=my-5+'px'});
+(function tick(){rx+=(mx-rx-17)*.12;ry+=(my-ry-17)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(tick)})();
+document.querySelectorAll('a,button,.lcard,.fitem,.rcard,.abox').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cur.style.transform='scale(2.5)';ring.style.transform='scale(1.5)'});
+  el.addEventListener('mouseleave',()=>{cur.style.transform='scale(1)';ring.style.transform='scale(1)'});
+});
+
+/* FADE OBSERVER */
+const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:.1});
+document.querySelectorAll('.fade-up').forEach(el=>obs.observe(el));
+
+/* TAB SWITCH */
+function switchTab(name,btn){
+  ['map','search','alerts','favs','profile'].forEach(t=>{
+    const el=document.getElementById('tab-'+t);if(el)el.classList.remove('active');
+  });
+  const target=document.getElementById('tab-'+name);if(target)target.classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  const idxMap={map:0,search:1,alerts:2,favs:3,profile:4};
+  document.querySelectorAll('.bni').forEach((b,i)=>b.classList.toggle('active',i===idxMap[name]));
+}
+
+/* SOCKET LOG */
+const logEl=document.getElementById('socketLog');
+let logIdx=0,gpsCount=0,notifCount=0;
+const EVTS=[
+  {t:'recv',m:'gps:update — DDD 42 @ {lat:14.6937,lng:-17.4478,spd:32}'},
+  {t:'emit',m:'subscribe:line — ["DDD 42","DDD 7"]'},
+  {t:'recv',m:'gps:update — DDD 7 @ {lat:14.7013,lng:-17.4553,spd:28}'},
+  {t:'recv',m:'alert:passage — DDD 42→Colobane dans 3min'},
+  {t:'emit',m:'ping'},
+  {t:'recv',m:'pong — 18ms'},
+  {t:'recv',m:'gps:update — DDD 1 @ {lat:14.6885,lng:-17.4402,spd:24}'},
+  {t:'recv',m:'bus:status — DDD 7 retard ~4min (trafic VDN)'},
+  {t:'emit',m:'route:request — {from:"Petersen",to:"Liberté 6"}'},
+  {t:'recv',m:'route:response — 3 itinéraires (Google Maps)'},
+  {t:'recv',m:'gps:update — DDD 42 @ {lat:14.6945,lng:-17.4491,spd:35}'},
+  {t:'fcm', m:'FCM push → 47 devices abonnés arrêt Colobane'},
+  {t:'sys', m:'MongoDB write — buses:ddd42_003 updated'},
+  {t:'recv',m:'gps:update — DDD 12 @ {lat:14.6910,lng:-17.4435,spd:18}'},
+  {t:'emit',m:'alert:create — {stop:"HLM",line:"DDD 42",delay:10}'},
+  {t:'recv',m:'gps:update — DDD 23 @ {lat:14.7050,lng:-17.4620,spd:22}'},
+  {t:'sys', m:'Heartbeat OK — 7 bus connectés'},
+  {t:'fcm', m:'FCM push → 23 devices abonnés arrêt HLM'},
+];
+function addLog(){
+  const e=EVTS[logIdx%EVTS.length];
+  const now=new Date(),ts=now.getMinutes().toString().padStart(2,'0')+':'+now.getSeconds().toString().padStart(2,'0');
+  const row=document.createElement('div');row.className='log-entry';
+  row.innerHTML=`<span class="lt">${ts}</span><span class="ltype ${e.t}">${e.t.toUpperCase()}</span><span class="lmsg">${e.m}</span>`;
+  logEl.appendChild(row);logEl.scrollTop=logEl.scrollHeight;
+  if(logEl.children.length>14) logEl.removeChild(logEl.firstChild);
+  if(e.t==='recv'&&e.m.includes('gps:')){gpsCount++;document.getElementById('gps-updates').textContent=gpsCount;document.getElementById('chart-total').textContent=gpsCount+' total';updateChart();updateMongo();}
+  if(e.t==='fcm'){notifCount++;document.getElementById('notif-count').textContent=notifCount;showPush();addFCMPhone();}
+  logIdx++;
+}
+setInterval(addLog,1300);
+
+/* PING */
+setInterval(()=>{
+  const p=Math.floor(Math.random()*16)+12;
+  document.getElementById('ping-val').textContent=p+'ms';
+  document.getElementById('rt-lat').textContent=p+'ms';
+  document.getElementById('rt-p95').textContent=(p*2+Math.floor(Math.random()*10))+'ms';
+  ['ms-lines','ms-buses','ms-route','ms-alert','ms-stops'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.textContent=Math.floor(Math.random()*15)+6;
+  });
+},3200);
+
+/* STATS FLICKER */
+setInterval(()=>{
+  document.getElementById('rt-users').textContent=Math.floor(Math.random()*20)+275;
+  document.getElementById('rt-gps').textContent=Math.floor(Math.random()*20)+185;
+  document.getElementById('conn-count').textContent=Math.floor(Math.random()*3)+280;
+},4000);
+
+/* CHART */
+const cdata=Array(28).fill(0).map(()=>Math.floor(Math.random()*65)+18);
+function renderChart(){
+  const el=document.getElementById('chartBars');if(!el)return;
+  el.innerHTML='';const mx=Math.max(...cdata);
+  cdata.forEach((v,i)=>{const b=document.createElement('div');b.className='cbar'+(i===cdata.length-1?' now':v>mx*.8?' peak':'');b.style.height=(v/mx*100)+'%';el.appendChild(b);});
+}
+function updateChart(){cdata.push(Math.floor(Math.random()*65)+18);if(cdata.length>28)cdata.shift();renderChart();}
+renderChart();
+setInterval(()=>{cdata.push(Math.floor(Math.random()*65)+18);if(cdata.length>28)cdata.shift();renderChart();},1300);
+
+/* BUS MOVEMENT */
+const buses={bus1:{x:42,dx:.36},bus2:{x:64,dx:.25},bus3:{x:38,dx:.3}};
+let b4y=35,b4dy=.22;
+function moveBuses(){
+  for(const[id,s] of Object.entries(buses)){s.x+=s.dx;if(s.x>87){s.x=87;s.dx=-Math.abs(s.dx);}if(s.x<6){s.x=6;s.dx=Math.abs(s.dx);}const el=document.getElementById(id);if(el)el.style.left=s.x+'%';}
+  b4y+=b4dy;if(b4y>85){b4y=85;b4dy=-.22;}if(b4y<12){b4y=12;b4dy=.22;}
+  const b4=document.getElementById('bus4');if(b4)b4.style.top=b4y+'%';
+  const dist=Math.abs(82-buses.bus1.x),eta=Math.max(1,Math.round(dist/7));
+  const etaEl=document.getElementById('eta-val');if(etaEl)etaEl.textContent='~'+eta+'min';
+  const spd=Math.floor(28+Math.random()*14);
+  const sEl=document.getElementById('doc-speed');if(sEl)sEl.textContent=spd;
+  const svEl=document.getElementById('speed-val');if(svEl)svEl.textContent=spd+'km/h';
+}
+setInterval(moveBuses,450);
+
+/* NEXT BUS */
+let nSec=480;
+setInterval(()=>{nSec=Math.max(0,nSec-1);if(nSec===0)nSec=Math.floor(Math.random()*300)+300;
+  const el=document.getElementById('next-bus-time');
+  if(el){const m=Math.floor(nSec/60),s=nSec%60;el.textContent=m>0?m+'min '+s+'s':s+'s';}
+},1000);
+
+/* MONGO UPDATE */
+function updateMongo(){
+  const lat=(14.6937+Math.random()*.006).toFixed(4);
+  const lng=(-17.4478-Math.random()*.006).toFixed(4);
+  const stops=['Petersen','Tilène','Colobane','HLM','Liberté 5','Liberté 6'];
+  const stop=stops[Math.floor(Math.random()*stops.length)];
+  const ts=new Date().toISOString().replace('T',' ').substring(0,19);
+  [['doc-lat',lat],['doc-lng',lng],['doc-occ',Math.floor(60+Math.random()*35)],['doc-eta',Math.floor(1+Math.random()*4)],['doc-stop','"'+stop+'"'],['doc-ts','"'+ts+'"']].forEach(([id,v])=>{const el=document.getElementById(id);if(el)el.textContent=v;});
+}
+
+/* PUSH NOTIF */
+const pushMsgs=[{t:'DDD 42 dans 2 minutes',b:'Arrêt Colobane — montez vite !'},{t:'DDD 7 en retard ~4min',b:'Trafic dense sur la VDN'},{t:'Bus arrivé à HLM',b:'DDD 12 · 3 places libres'},{t:'Alerte Liberté 6',b:'DDD 42 dans 5 minutes'}];
+let pushTmr=null;
+function showPush(){
+  const pn=document.getElementById('push-notif');if(!pn)return;
+  const msg=pushMsgs[Math.floor(Math.random()*pushMsgs.length)];
+  document.getElementById('pn-title').textContent=msg.t;document.getElementById('pn-body').textContent=msg.b;
+  pn.style.display='block';clearTimeout(pushTmr);pushTmr=setTimeout(()=>pn.style.display='none',3500);
+}
+
+/* FCM PHONES */
+const fcmEl=document.getElementById('fcm-phones');
+const fcmMsgs=[{t:'DDD 42 — 2min',b:'Arrêt Colobane'},{t:'Bus complet DDD 7',b:'Prochain dans 8min'},{t:'DDD 1 à votre arrêt',b:'Descendez maintenant'},{t:'Alerte HLM',b:'DDD 42 dans 5min'},{t:'Nouveau trajet dispo',b:'Route optimisée'}];
+let fcmIdx=0;
+function addFCMPhone(){
+  if(fcmEl.children.length>=5)fcmEl.removeChild(fcmEl.firstChild);
+  const msg=fcmMsgs[fcmIdx%fcmMsgs.length];fcmIdx++;
+  const d=document.createElement('div');d.className='mini-phone';
+  d.innerHTML=`<div class="mp-bar">🔥 Firebase FCM</div><div class="mp-screen"><div class="mp-notif"><div class="mpn-app">🚌 DakarGo</div><div class="mpn-title">${msg.t}</div><div class="mpn-body">${msg.b}</div></div></div>`;
+  fcmEl.appendChild(d);
+}
+for(let i=0;i<3;i++)setTimeout(addFCMPhone,i*800);
+
+/* ROUTES */
+const routeData=[
+  {tag:'DIRECT',tc:'',time:'14 min',dep:'dans 2min',name:'Ligne DDD 42',det:'Petersen → Colobane → HLM → Liberté 6',stops:['Petersen','Colobane','HLM','Lib 6']},
+  {tag:'EXPRESS',tc:'exp',time:'18 min',dep:'dans 6min',name:'Ligne DDD 12',det:'Moins d\'arrêts · Via VDN',stops:['Petersen','VDN','Lib 6']},
+  {tag:'1 CORRESP',tc:'cor',time:'22 min',dep:'dans 4min',name:'DDD 1 → DDD 7',det:'Correspondance Colobane · 3min attente',stops:['Petersen','Colobane','Lib 5','Lib 6']},
+];
+const rr=document.getElementById('route-results');
+routeData.forEach((r,i)=>{
+  const d=document.createElement('div');d.className='rcard'+(i===0?' sel':'');
+  d.innerHTML=`<div class="rcard-top"><span class="rtag ${r.tc}">${r.tag}</span><span style="font-size:8px;color:var(--muted)">Départ <span style="color:var(--accent)">${r.dep}</span></span><span class="rtime">${r.time}</span></div><div class="rname">${r.name}</div><div class="rdet">${r.det}</div><div class="rbar"><div class="rdot"></div><div class="rlinee"><div class="rbus">🚌</div></div><div class="rdot"></div></div><div class="rstops">${r.stops.map(s=>`<span class="rstop">${s}</span>`).join('')}</div>`;
+  d.onclick=()=>{document.querySelectorAll('.rcard').forEach(c=>c.classList.remove('sel'));d.classList.add('sel');};
+  rr.appendChild(d);
+});
+
+/* ALERTS */
+const alertData=[
+  {ico:'🔔',cls:'new',t:'DDD 42 dans 2 min — Colobane',s:'Arrêt Colobane · Petersen→Liberté 6 <span class="fcm-badge">FCM</span>',time:'maintenant'},
+  {ico:'⚠️',cls:'warn',t:'DDD 7 — Retard ~4 min',s:'Trafic dense sur VDN · GPS temps réel',time:'il y a 2min'},
+  {ico:'📍',cls:'',t:'Alerte configurée : HLM',s:'Notification 10min avant passage · DDD 42',time:'il y a 8min'},
+  {ico:'✅',cls:'ok',t:'DDD 1 en service',s:'Toutes les lignes opérationnelles',time:'il y a 15min'},
+  {ico:'🔔',cls:'new',t:'DDD 12 dans 5 min — Plateau',s:'Arrêt Kermel <span class="fcm-badge">FCM</span>',time:'il y a 1min'},
+];
+const al=document.getElementById('alert-list');
+alertData.forEach(a=>{const d=document.createElement('div');d.className='aitem '+a.cls;d.innerHTML=`<span class="aico">${a.ico}</span><div class="acont"><div class="at">${a.t}</div><div class="as">${a.s}</div></div><span class="atime">${a.time}</span>`;al.appendChild(d);});
+
+/* FAVS */
+const favData=[
+  {ico:'🏠',n:'Maison — Liberté 6',s:'DDD 42, DDD 7',offline:true,eta:'DDD 42 dans 8min'},
+  {ico:'🏢',n:'Bureau — Plateau',s:'Arrêt Kermel · DDD 1',offline:true,eta:'DDD 1 dans 3min'},
+  {ico:'🏪',n:'Marché Colobane',s:'Arrêt Colobane · DDD 42',offline:false,eta:'DDD 42 dans 12min'},
+  {ico:'🏥',n:'Hôpital Principal',s:'Arrêt Fann · DDD 12',offline:false,eta:'DDD 12 dans 6min'},
+];
+const fl=document.getElementById('fav-list');
+favData.forEach(f=>{const d=document.createElement('div');d.className='fitem';d.innerHTML=`<span class="fico">${f.ico}</span><div class="finfo"><div class="fn">${f.n}</div><div class="fs">${f.s}</div>${f.offline?'<span class="off-badge">📡 Hors-ligne</span>':''}<div class="feta">${f.eta}</div></div><span class="farrow">›</span>`;fl.appendChild(d);});
+
+/* BUS COUNT */
+setInterval(()=>{const v=7+Math.floor(Math.random()*3)-1;document.getElementById('bus-count').textContent=Math.max(5,v);document.getElementById('rt-bus').textContent=Math.max(5,v);},5000);
+
+updateMongo();
+
+/* ── CODE TAB SWITCHER ── */
+const codeBlocks={rn:['socket','map','notif'],be:['server','gps','fcm']};
+function showCode(side,id){
+  // hide all blocks for this side
+  codeBlocks[side].forEach(b=>{
+    const el=document.getElementById('code-'+b);
+    if(el) el.style.display='none';
+  });
+  const show=document.getElementById('code-'+id);
+  if(show) show.style.display='block';
+  // update tab active states for this side's tabs
+  document.querySelectorAll('.code-tab').forEach(t=>{
+    if(t.id==='ct-'+id) t.classList.add('active');
+    else if(codeBlocks[side].some(b=>'ct-'+b===t.id)) t.classList.remove('active');
+  });
+}
+
+/* ── TIMELINE INTERSECTION REVEAL ── */
+const tobs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.style.opacity='1';e.target.style.transform='translateX(0)'}}),{threshold:.15});
+document.querySelectorAll('.tcard').forEach((el,i)=>{
+  el.style.opacity='0';el.style.transform='translateX(16px)';
+  el.style.transition=`opacity .5s ${i*.1}s cubic-bezier(.16,1,.3,1),transform .5s ${i*.1}s cubic-bezier(.16,1,.3,1)`;
+  tobs.observe(el);
+});
+
+/* ── IMPACT COUNTERS ── */
+const counters=[
+  {id:'ic1',target:23,suffix:'',prefix:''},
+  {id:'ic2',target:3247,suffix:'',prefix:''},
+  {id:'ic3',target:96768,suffix:'',prefix:''},
+];
+function animateCounter(id,target,duration=1800){
+  const el=document.getElementById(id);if(!el)return;
+  const start=Date.now();
+  const tick=()=>{
+    const elapsed=Date.now()-start;
+    const progress=Math.min(elapsed/duration,1);
+    const eased=1-Math.pow(1-progress,3);
+    const val=Math.floor(eased*target);
+    el.textContent=val.toLocaleString('fr-FR');
+    if(progress<1) requestAnimationFrame(tick);
+  };
+  tick();
+}
+// Trigger counters when impact section scrolls into view
+const impactObs=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){
+    counters.forEach(c=>animateCounter(c.id,c.target));
+    // animate ic-fill bars
+    document.querySelectorAll('.ic-fill').forEach(b=>{const w=b.style.width;b.style.width='0';setTimeout(()=>b.style.width=w,100);});
+    impactObs.disconnect();
+  }
+}),{threshold:.2});
+const impactSection=document.querySelector('.impact-card');
+if(impactSection) impactObs.observe(impactSection.closest('.section')||impactSection);
+
+/* ── PEAK USAGE CHART ── */
+const peakData=[18,42,88,62,35,28,40,95,70,48,30,22,32,58,65,82];
+const peakEl=document.getElementById('peak-chart');
+if(peakEl){
+  const mx=Math.max(...peakData);
+  peakData.forEach((v,i)=>{
+    const b=document.createElement('div');
+    b.className='peak-bar'+(v>70?' hi':v>45?' med':'');
+    b.style.height=(v/mx*100)+'%';
+    peakEl.appendChild(b);
+  });
+}
+
+/* ── TESTIMONIALS STAGGER ── */
+const testiObs=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){
+    e.target.style.opacity='1';e.target.style.transform='translateY(0)';
+  }
+}),{threshold:.15});
+document.querySelectorAll('.testi').forEach((el,i)=>{
+  el.style.opacity='0';el.style.transform='translateY(20px)';
+  el.style.transition=`opacity .5s ${i*.12}s cubic-bezier(.16,1,.3,1),transform .5s ${i*.12}s cubic-bezier(.16,1,.3,1),border-color .25s,box-shadow .25s`;
+  testiObs.observe(el);
+});
+
+/* ── LIVE CONNECTION COUNT in nav ── */
+setInterval(()=>{
+  const el=document.getElementById('conn-count');
+  if(el) el.textContent=Math.floor(Math.random()*15)+275;
+},3800);
+</script>
+</body>
+</html>

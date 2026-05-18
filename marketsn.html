@@ -1,0 +1,1672 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MarketSN — Application Mobile Flutter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════
+   RESET & VARIABLES
+═══════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+
+:root {
+  --bg:        #F7F5F0;
+  --bg2:       #EFEDE8;
+  --ink:       #0D0D0D;
+  --ink2:      #3A3A3A;
+  --muted:     #8A8A8A;
+  --border:    #D8D4CC;
+  --surface:   #FFFFFF;
+  --wave:      #00B4A0;
+  --wave-light:#E0F7F4;
+  --fire:      #FF6B35;
+  --fire-light:#FFF0EB;
+  --flutter:   #54C5F8;
+  --flutter-bg:#EEF9FF;
+  --mongo:     #47A248;
+  --mongo-bg:  #EDF7ED;
+  --node:      #68A063;
+  --node-bg:   #EEF5EE;
+  --rail:      #C73232;
+  --rail-bg:   #FCEAEA;
+  --accent:    #0D0D0D;
+  --gold:      #D4A853;
+  --gold-light:#FBF3E3;
+  --radius:    4px;
+  --mono:      'JetBrains Mono', monospace;
+  --sans:      'Space Grotesk', sans-serif;
+  --display:   'Bebas Neue', sans-serif;
+}
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--ink);
+  overflow-x: hidden;
+  cursor: none;
+  line-height: 1.6;
+}
+
+/* ── CURSOR ── */
+.cur { width:12px;height:12px;background:var(--ink);border-radius:50%;position:fixed;z-index:99999;pointer-events:none;transition:transform .08s,width .2s,height .2s; }
+.cur-ring { width:40px;height:40px;border:1.5px solid var(--ink);border-radius:50%;position:fixed;z-index:99998;pointer-events:none;transition:all .18s; }
+body.hov .cur  { width:6px;height:6px;background:var(--wave); }
+body.hov .cur-ring { width:52px;height:52px;border-color:var(--wave);opacity:.5; }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:var(--bg); }
+::-webkit-scrollbar-thumb { background:var(--border);border-radius:4px; }
+::-webkit-scrollbar-thumb:hover { background:var(--muted); }
+
+/* ═══════════════════════════════════════════════
+   NAV
+═══════════════════════════════════════════════ */
+nav {
+  position: fixed; top:0; left:0; right:0; z-index:1000;
+  background: rgba(247,245,240,.9);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 3rem;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 60px;
+}
+.nav-left { display:flex;align-items:center;gap:14px; }
+.nav-logo {
+  font-family: var(--display);
+  font-size: 22px; letter-spacing:.04em;
+  color: var(--ink);
+  text-decoration: none;
+}
+.nav-tag {
+  background: var(--wave); color:#fff;
+  font-size: 10px; font-weight:700; letter-spacing:.1em;
+  padding: 3px 10px; border-radius:20px; text-transform:uppercase;
+}
+.nav-links { display:flex;gap:2rem;align-items:center; }
+.nav-links a {
+  font-size:13px; color:var(--muted); text-decoration:none;
+  font-weight:500; transition:color .2s; letter-spacing:.02em;
+}
+.nav-links a:hover { color:var(--ink); }
+.nav-cta {
+  background: var(--ink); color:#fff;
+  font-size:12px; font-weight:600; padding:8px 18px;
+  text-decoration:none; border-radius:var(--radius); transition:all .2s;
+  letter-spacing:.04em;
+}
+.nav-cta:hover { background:var(--wave);transform:translateY(-1px); }
+
+/* ═══════════════════════════════════════════════
+   HERO
+═══════════════════════════════════════════════ */
+.hero {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 480px;
+  gap: 0;
+  padding-top: 60px;
+  position: relative;
+  overflow: hidden;
+}
+.hero-left {
+  padding: 6rem 3rem 4rem;
+  display: flex; flex-direction:column; justify-content:center;
+  position: relative; z-index:2;
+  border-right: 1px solid var(--border);
+}
+.hero-eyebrow {
+  display: inline-flex; align-items:center; gap:8px;
+  font-family: var(--mono); font-size:11px; color:var(--wave);
+  letter-spacing:.12em; text-transform:uppercase; margin-bottom:2rem;
+}
+.hero-eyebrow::before { content:'◆'; font-size:8px; }
+.hero-num {
+  font-family: var(--display);
+  font-size: clamp(90px,12vw,160px);
+  line-height: .88; letter-spacing:.01em;
+  color: var(--ink); margin-bottom:-.5rem;
+  position:relative;
+}
+.hero-num .stroke {
+  color: transparent;
+  -webkit-text-stroke: 2px var(--border);
+}
+.hero-title-block { margin-bottom: 2.5rem; }
+.hero-title {
+  font-family: var(--display);
+  font-size: clamp(52px, 7vw, 88px);
+  line-height: .92; letter-spacing:.04em;
+  color: var(--ink);
+}
+.hero-title .wave-word { color: var(--wave); }
+.hero-sub {
+  font-size: 15px; color:var(--ink2); line-height:1.75;
+  max-width:480px; margin-bottom:2.5rem; font-weight:400;
+}
+.hero-sub strong { color:var(--ink); font-weight:600; }
+.hero-chips { display:flex;flex-wrap:wrap;gap:8px;margin-bottom:2.5rem; }
+.chip {
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--mono); font-size:11px; font-weight:600;
+  padding:6px 14px; border-radius:20px; border:1.5px solid;
+  letter-spacing:.04em; transition:all .2s;
+}
+.chip:hover { transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.08); }
+.chip-flutter { color:var(--flutter); border-color:var(--flutter); background:var(--flutter-bg); }
+.chip-fire    { color:#F57C00;border-color:#F57C00;background:#FFF3E0; }
+.chip-node    { color:var(--node);border-color:var(--node);background:var(--node-bg); }
+.chip-wave    { color:var(--wave);border-color:var(--wave);background:var(--wave-light); }
+.chip-mongo   { color:var(--mongo);border-color:var(--mongo);background:var(--mongo-bg); }
+.chip-rail    { color:var(--rail);border-color:var(--rail);background:var(--rail-bg); }
+.chip-render  { color:#5A2FC2;border-color:#5A2FC2;background:#F3EEFF; }
+.hero-ctas { display:flex;gap:12px;flex-wrap:wrap; }
+.btn-dark {
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--ink);color:#fff;padding:13px 26px;
+  font-family:var(--mono);font-size:12px;font-weight:600;letter-spacing:.08em;
+  border:none;border-radius:var(--radius);cursor:none;text-decoration:none;
+  transition:all .2s;
+}
+.btn-dark:hover { background:var(--wave);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,180,160,.25); }
+.btn-ghost {
+  display:inline-flex;align-items:center;gap:8px;
+  border:1.5px solid var(--border);color:var(--ink2);padding:13px 26px;
+  font-family:var(--mono);font-size:12px;letter-spacing:.08em;
+  border-radius:var(--radius);cursor:none;text-decoration:none;transition:all .2s;
+}
+.btn-ghost:hover { border-color:var(--ink);color:var(--ink); }
+
+/* PHONE COLUMN */
+.hero-right {
+  background: var(--bg2);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:4rem 3rem;gap:2rem; position:relative;
+}
+.hero-right::before {
+  content:''; position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 50% 30%,rgba(0,180,160,.08),transparent);
+}
+.phone-device {
+  width:240px;height:480px;
+  background:var(--ink);border-radius:36px;
+  overflow:hidden;position:relative;z-index:2;
+  box-shadow:
+    0 0 0 8px #1a1a1a,
+    0 0 0 10px #2a2a2a,
+    0 40px 80px rgba(0,0,0,.4),
+    0 0 0 1.5px rgba(255,255,255,.06) inset;
+  animation: float 4s ease-in-out infinite;
+}
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+.phone-notch {
+  position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:90px;height:22px;background:var(--ink);border-radius:0 0 16px 16px;z-index:10;
+}
+.phone-screen {
+  width:100%;height:100%;background:#FAFAF8;
+  display:flex;flex-direction:column;
+  font-family:var(--sans);
+}
+/* App screens */
+.screen { flex:1;display:flex;flex-direction:column;padding-top:24px; }
+.screen-nav {
+  padding:8px 16px;display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid #F0EEE8;
+}
+.screen-logo { font-family:var(--display);font-size:18px;letter-spacing:.04em;color:#0D0D0D; }
+.screen-logo span { color:var(--wave); }
+.s-cart { font-size:18px;position:relative; }
+.s-badge {
+  position:absolute;top:-4px;right:-4px;width:14px;height:14px;
+  background:var(--fire);border-radius:50%;font-size:8px;font-weight:700;
+  color:#fff;display:flex;align-items:center;justify-content:center;
+}
+.s-search {
+  margin:8px 12px;background:#F0EEE8;border-radius:20px;
+  padding:7px 12px;display:flex;align-items:center;gap:6px;
+  font-size:10px;color:#8A8A8A;
+}
+.s-cats {
+  display:flex;gap:6px;padding:6px 12px;overflow-x:auto;
+  scrollbar-width:none;flex-shrink:0;
+}
+.s-cats::-webkit-scrollbar { display:none; }
+.s-cat {
+  flex-shrink:0;padding:4px 10px;border-radius:14px;
+  font-size:9px;font-weight:600;white-space:nowrap;
+}
+.s-cat.on { background:var(--wave);color:#fff; }
+.s-cat:not(.on) { background:#F0EEE8;color:#6A6A6A; }
+.s-section-title { padding:6px 12px;font-size:10px;font-weight:700;color:#3A3A3A;letter-spacing:.04em; }
+.s-grid { display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:0 12px; }
+.s-card { background:#fff;border-radius:10px;overflow:hidden;border:1px solid #F0EEE8; }
+.s-card-img { height:56px;display:flex;align-items:center;justify-content:center;font-size:22px; }
+.s-card-body { padding:6px 8px; }
+.s-card-name { font-size:9px;font-weight:700;color:#0D0D0D;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.s-card-shop { font-size:8px;color:#8A8A8A; }
+.s-card-foot { display:flex;align-items:center;justify-content:space-between;margin-top:4px; }
+.s-price { font-size:10px;font-weight:700;color:var(--wave); }
+.s-add { width:18px;height:18px;background:var(--wave);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;font-weight:700; }
+.s-tab { display:flex;border-top:1px solid #F0EEE8;flex-shrink:0; }
+.s-tab-item { flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 4px;gap:2px;font-size:7px;color:#8A8A8A; }
+.s-tab-item.on { color:var(--wave); }
+.s-tab-icon { font-size:14px; }
+
+/* Stats strip hero */
+.hero-stats {
+  position:relative;z-index:2;
+  display:grid;grid-template-columns:1fr 1fr;gap:1px;
+  background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden;
+  width:100%;
+}
+.hs { background:var(--bg);padding:1rem;text-align:center; }
+.hs-n { font-family:var(--display);font-size:28px;color:var(--wave);line-height:1; }
+.hs-l { font-size:10px;color:var(--muted);letter-spacing:.08em;margin-top:2px; }
+
+/* ═══════════════════════════════════════════════
+   SECTIONS COMMUNES
+═══════════════════════════════════════════════ */
+.section { padding:6rem 3rem;position:relative; }
+.section-label {
+  font-family:var(--mono);font-size:10px;color:var(--wave);
+  letter-spacing:.2em;text-transform:uppercase;margin-bottom:.75rem;
+}
+.section-label::before { content:'// '; color:var(--muted); }
+.section-title {
+  font-family:var(--display);
+  font-size:clamp(42px,5vw,64px);
+  letter-spacing:.04em;line-height:.95;margin-bottom:1.25rem;
+}
+.section-title em { color:var(--wave);font-style:normal; }
+.section-desc { font-size:14px;color:var(--ink2);line-height:1.75;max-width:600px;margin-bottom:3rem; }
+.section-desc strong { color:var(--ink);font-weight:600; }
+
+/* Divider */
+hr.divider { border:none;border-top:1px solid var(--border);margin:0; }
+
+/* ═══════════════════════════════════════════════
+   ARCHITECTURE
+═══════════════════════════════════════════════ */
+#archi { background:var(--ink);color:#fff; }
+#archi .section-label { color:var(--wave); }
+#archi .section-title { color:#fff; }
+#archi .section-desc { color:rgba(255,255,255,.6); }
+#archi .section-desc strong { color:#fff; }
+
+.archi-diagram {
+  display:grid;
+  grid-template-columns:1fr 40px 1fr 40px 1fr;
+  gap:0;align-items:center;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:12px;overflow:hidden;
+}
+.archi-layer {
+  padding:2rem;border-right:1px solid rgba(255,255,255,.08);
+  position:relative;
+}
+.archi-layer:last-child { border-right:none; }
+.archi-arrow {
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;color:var(--wave);
+}
+.archi-layer-tag {
+  font-family:var(--mono);font-size:9px;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--wave);margin-bottom:1rem;
+}
+.archi-layer-title { font-family:var(--display);font-size:26px;letter-spacing:.04em;margin-bottom:1.25rem; }
+.archi-item {
+  display:flex;align-items:flex-start;gap:10px;
+  padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06);
+}
+.archi-item:last-child { border-bottom:none;padding-bottom:0; }
+.archi-icon { font-size:18px;flex-shrink:0;width:28px;text-align:center;margin-top:1px; }
+.archi-item-title { font-size:13px;font-weight:600;color:#fff;margin-bottom:2px; }
+.archi-item-desc { font-size:11px;color:rgba(255,255,255,.45);line-height:1.5; }
+
+/* Code block */
+.code-block {
+  background:#0D0D0D;border:1px solid rgba(255,255,255,.1);
+  border-radius:8px;overflow:hidden;margin-top:2rem;
+}
+.code-bar {
+  background:#1a1a1a;padding:10px 16px;display:flex;align-items:center;
+  gap:8px;border-bottom:1px solid rgba(255,255,255,.06);
+}
+.code-dot { width:10px;height:10px;border-radius:50%; }
+.cd-r{background:#FF5F57}.cd-y{background:#FFBD2E}.cd-g{background:#28C840}
+.code-filename { margin-left:auto;font-family:var(--mono);font-size:10px;color:rgba(255,255,255,.3); }
+.code-body { padding:1.5rem;font-family:var(--mono);font-size:11.5px;line-height:2;overflow-x:auto; }
+.ck  { color:#C792EA; }   /* keyword */
+.cs  { color:#C3E88D; }   /* string */
+.cf  { color:#82AAFF; }   /* function */
+.cn  { color:#F78C6C; }   /* number */
+.cc  { color:rgba(255,255,255,.25);font-style:italic; } /* comment */
+.co  { color:#FFCB6B; }   /* const/var */
+.cw  { color:var(--wave); } /* accent */
+.cm  { color:var(--muted); } /* muted */
+
+/* ═══════════════════════════════════════════════
+   SCREENS DÉMO (toutes les pages de l'app)
+═══════════════════════════════════════════════ */
+#screens { background:var(--bg2); }
+.screens-tabs {
+  display:flex;gap:0;border:1px solid var(--border);border-radius:8px;
+  overflow:hidden;width:fit-content;margin-bottom:2.5rem;
+}
+.stab {
+  padding:9px 20px;font-size:12px;font-weight:600;
+  cursor:none;transition:all .2s;border:none;
+  background:transparent;color:var(--muted);font-family:var(--sans);
+  letter-spacing:.02em;
+}
+.stab.on { background:var(--ink);color:#fff; }
+.stab:hover:not(.on) { background:var(--border); }
+
+.screens-showcase {
+  display:grid;grid-template-columns:repeat(5,1fr);gap:1.5rem;
+  align-items:flex-start;
+}
+.screen-mock {
+  display:flex;flex-direction:column;align-items:center;gap:12px;
+}
+.mock-label { font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.08em; }
+.mock-phone {
+  width:140px;height:280px;background:var(--ink);border-radius:22px;
+  overflow:hidden;position:relative;
+  box-shadow:0 0 0 5px #1a1a1a,0 0 0 6px #2a2a2a,0 24px 48px rgba(0,0,0,.25);
+  flex-shrink:0;
+}
+.mock-notch {
+  position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:48px;height:12px;background:var(--ink);border-radius:0 0 10px 10px;z-index:10;
+}
+.mock-screen { width:100%;height:100%;font-family:var(--sans); }
+/* Les couleurs de fond de chaque écran */
+.ms-home  { background:#FAFAF8; }
+.ms-search{ background:#FAFAF8; }
+.ms-prod  { background:#FAFAF8; }
+.ms-cart  { background:#FAFAF8; }
+.ms-pay   { background:#F0FDF8; }
+.ms-profile{background:#FAFAF8; }
+.ms-seller{ background:#FFF8F5; }
+.ms-orders{ background:#FAFAF8; }
+.ms-notif { background:#FAFAF8; }
+.ms-onboard{background:var(--ink);}
+
+/* ═══════════════════════════════════════════════
+   WAVE API SECTION
+═══════════════════════════════════════════════ */
+#payment { background:var(--wave-light); }
+.pay-grid { display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center; }
+.pay-flow {
+  display:flex;flex-direction:column;gap:0;
+  background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  overflow:hidden;
+}
+.pay-step {
+  display:flex;gap:16px;padding:1.25rem 1.5rem;
+  border-bottom:1px solid var(--border);transition:background .2s;
+  position:relative;
+}
+.pay-step:last-child { border-bottom:none; }
+.pay-step:hover { background:var(--wave-light); }
+.pay-step-num {
+  width:28px;height:28px;border-radius:50%;
+  background:var(--wave);color:#fff;
+  font-size:12px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.pay-step-title { font-size:13px;font-weight:700;margin-bottom:2px; }
+.pay-step-desc { font-size:12px;color:var(--ink2);line-height:1.5; }
+.pay-methods { display:flex;flex-direction:column;gap:1rem; }
+.pay-method {
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  padding:1.25rem 1.5rem;display:flex;align-items:center;gap:14px;
+  transition:all .2s;cursor:pointer;
+}
+.pay-method:hover { border-color:var(--wave);box-shadow:0 4px 16px rgba(0,180,160,.1); }
+.pay-method-icon { font-size:28px; }
+.pay-method-name { font-size:14px;font-weight:700;margin-bottom:2px; }
+.pay-method-desc { font-size:12px;color:var(--muted); }
+.pay-method-badge {
+  margin-left:auto;padding:4px 10px;border-radius:20px;
+  font-size:10px;font-weight:700;letter-spacing:.06em;
+}
+.badge-wave { background:var(--wave);color:#fff; }
+.badge-om   { background:#FF7900;color:#fff; }
+.badge-card { background:var(--ink);color:#fff; }
+
+/* ═══════════════════════════════════════════════
+   BACKEND — NODE + MONGO
+═══════════════════════════════════════════════ */
+#backend { background:var(--bg); }
+.backend-grid { display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2rem; }
+.backend-card {
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  overflow:hidden;
+}
+.bc-header {
+  padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;
+}
+.bc-icon { font-size:24px; }
+.bc-title { font-size:15px;font-weight:700; }
+.bc-sub   { font-size:11px;color:var(--muted); }
+.bc-body  { padding:1.5rem; }
+.api-route {
+  display:flex;align-items:center;gap:10px;padding:9px 0;
+  border-bottom:1px solid var(--bg2);font-family:var(--mono);font-size:12px;
+}
+.api-route:last-child { border-bottom:none; }
+.method {
+  padding:2px 8px;border-radius:4px;font-size:9px;font-weight:700;
+  letter-spacing:.06em;flex-shrink:0;min-width:44px;text-align:center;
+}
+.m-get    { background:#DBEAFE;color:#1D4ED8; }
+.m-post   { background:#D1FAE5;color:#065F46; }
+.m-put    { background:#FEF3C7;color:#92400E; }
+.m-delete { background:#FEE2E2;color:#991B1B; }
+.route-path { color:var(--ink2); flex:1; }
+.route-desc { font-size:10px;color:var(--muted); }
+
+/* Schema Mongo */
+.schema-field {
+  display:flex;align-items:flex-start;gap:12px;padding:9px 0;
+  border-bottom:1px solid var(--bg2);font-size:12px;
+}
+.schema-field:last-child { border-bottom:none; }
+.field-name { font-family:var(--mono);color:var(--wave);min-width:110px;font-weight:600; }
+.field-type { font-family:var(--mono);color:var(--fire);min-width:80px;font-size:11px; }
+.field-desc { color:var(--muted);font-size:11px; }
+
+/* ═══════════════════════════════════════════════
+   FIREBASE
+═══════════════════════════════════════════════ */
+#firebase { background:var(--fire-light); }
+.fire-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem; }
+.fire-card {
+  background:var(--surface);border:1px solid #FFD0B5;border-radius:10px;
+  padding:1.5rem;transition:all .2s;
+}
+.fire-card:hover { border-color:var(--fire);transform:translateY(-3px);box-shadow:0 8px 24px rgba(255,107,53,.1); }
+.fire-card-icon { font-size:32px;margin-bottom:1rem;display:block; }
+.fire-card-title { font-size:15px;font-weight:700;margin-bottom:.5rem; }
+.fire-card-desc { font-size:12px;color:var(--ink2);line-height:1.65; }
+.fire-feature { display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink2);margin-top:8px; }
+.fire-feature::before { content:'→';color:var(--fire);font-size:10px; }
+
+/* ═══════════════════════════════════════════════
+   DEPLOY — RAILWAY + RENDER
+═══════════════════════════════════════════════ */
+#deploy { background:var(--ink);color:#fff; }
+#deploy .section-label { color:var(--wave); }
+#deploy .section-title { color:#fff; }
+#deploy .section-desc { color:rgba(255,255,255,.55); }
+.deploy-grid { display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2.5rem; }
+.deploy-card {
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:10px;overflow:hidden;transition:border-color .2s;
+}
+.deploy-card:hover { border-color:var(--wave); }
+.dc-head {
+  padding:1.25rem 1.5rem;border-bottom:1px solid rgba(255,255,255,.08);
+  display:flex;align-items:center;gap:12px;
+}
+.dc-badge {
+  font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;
+  margin-left:auto;letter-spacing:.06em;
+}
+.db-rail { background:rgba(199,50,50,.2);color:#FF8080; }
+.db-render { background:rgba(90,47,194,.2);color:#A78BFA; }
+.dc-title { font-size:16px;font-weight:700;color:#fff; }
+.dc-sub   { font-size:11px;color:rgba(255,255,255,.4); }
+.dc-body  { padding:1.5rem; }
+.dc-item {
+  display:flex;align-items:center;gap:10px;padding:8px 0;
+  border-bottom:1px solid rgba(255,255,255,.06);font-size:12px;
+  color:rgba(255,255,255,.7);
+}
+.dc-item:last-child { border-bottom:none; }
+.dc-item::before { content:'✓';color:var(--wave);font-weight:700;font-size:11px; }
+
+.deploy-flow {
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);
+  border-radius:10px;padding:1.5rem;
+}
+.df-title { font-size:13px;font-weight:700;color:#fff;margin-bottom:1.25rem;display:flex;align-items:center;gap:8px; }
+.df-title::before { content:'⚡';font-size:16px; }
+.df-steps { display:flex;align-items:center;gap:0;overflow-x:auto; }
+.df-step {
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  flex-shrink:0;padding:0 1rem;
+}
+.df-step-icon {
+  width:44px;height:44px;border-radius:50%;
+  background:rgba(255,255,255,.08);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;border:1px solid rgba(255,255,255,.12);
+}
+.df-step-label { font-size:10px;color:rgba(255,255,255,.5);text-align:center;line-height:1.3; }
+.df-arrow { color:var(--wave);font-size:18px;flex-shrink:0;padding:0 .5rem; }
+
+/* ═══════════════════════════════════════════════
+   FEATURES GRID
+═══════════════════════════════════════════════ */
+#features { background:var(--bg); }
+.feat-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden; }
+.feat-card {
+  background:var(--surface);padding:2rem;
+  transition:background .2s;position:relative;overflow:hidden;
+}
+.feat-card:hover { background:var(--wave-light); }
+.feat-card::before {
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--wave);transform:scaleX(0);transform-origin:left;
+  transition:transform .3s;
+}
+.feat-card:hover::before { transform:scaleX(1); }
+.feat-num { font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:.75rem;letter-spacing:.12em; }
+.feat-icon { font-size:30px;margin-bottom:1rem;display:block; }
+.feat-title { font-family:var(--display);font-size:22px;letter-spacing:.04em;margin-bottom:.75rem; }
+.feat-desc { font-size:13px;color:var(--ink2);line-height:1.7; }
+
+/* ═══════════════════════════════════════════════
+   FLUTTER STRUCTURE
+═══════════════════════════════════════════════ */
+#structure { background:var(--flutter-bg); }
+.folder-tree {
+  background:var(--ink);border-radius:10px;overflow:hidden;
+  font-family:var(--mono);font-size:12px;line-height:1.9;
+}
+.ft-bar {
+  background:#1a1a1a;padding:10px 16px;display:flex;align-items:center;
+  gap:8px;border-bottom:1px solid rgba(255,255,255,.06);
+}
+.ft-body { padding:1.5rem; }
+.ft-folder { color:var(--flutter); }
+.ft-file   { color:rgba(255,255,255,.7); }
+.ft-dart   { color:#54C5F8; }
+.ft-yaml   { color:#FFCB6B; }
+.ft-json   { color:#C3E88D; }
+.ft-indent1 { padding-left:20px; }
+.ft-indent2 { padding-left:40px; }
+.ft-indent3 { padding-left:60px; }
+.ft-comment { color:rgba(255,255,255,.2);font-style:italic; }
+
+/* ═══════════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════════ */
+footer {
+  background:var(--ink);color:#fff;
+  padding:3rem;display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:1.5rem;
+  border-top:1px solid rgba(255,255,255,.08);
+}
+.footer-brand { font-family:var(--display);font-size:28px;letter-spacing:.04em; }
+.footer-brand span { color:var(--wave); }
+.footer-meta { font-size:12px;color:rgba(255,255,255,.4); }
+.footer-meta strong { color:#fff; }
+.footer-back {
+  display:inline-flex;align-items:center;gap:8px;
+  border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);
+  padding:10px 20px;font-family:var(--mono);font-size:11px;
+  text-decoration:none;border-radius:var(--radius);
+  transition:all .2s;cursor:none;
+}
+.footer-back:hover { border-color:var(--wave);color:var(--wave); }
+
+/* ═══════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════ */
+.toast {
+  position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(80px);
+  background:var(--ink);color:#fff;padding:12px 24px;border-radius:30px;
+  font-size:13px;font-weight:500;z-index:9999;opacity:0;transition:.3s;
+  border:1px solid rgba(255,255,255,.1);box-shadow:0 8px 32px rgba(0,0,0,.3);
+  white-space:nowrap;
+}
+.toast.show { transform:translateX(-50%) translateY(0);opacity:1; }
+
+/* ─── Responsive ─── */
+@media(max-width:900px){
+  .hero { grid-template-columns:1fr;padding-top:60px; }
+  .hero-right { display:none; }
+  .archi-diagram { grid-template-columns:1fr;grid-template-rows:auto }
+  .archi-arrow { display:none }
+  .screens-showcase { grid-template-columns:repeat(3,1fr); }
+  .pay-grid,.backend-grid,.deploy-grid,.fire-grid { grid-template-columns:1fr; }
+  .feat-grid { grid-template-columns:1fr 1fr; }
+  .section { padding:4rem 1.5rem; }
+  nav { padding:0 1.5rem; }
+}
+@media(max-width:600px){
+  .screens-showcase { grid-template-columns:repeat(2,1fr); }
+  .feat-grid { grid-template-columns:1fr; }
+  .hero-left { padding:4rem 1.5rem 3rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="cur"  id="cur"></div>
+<div class="cur-ring" id="curRing"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-left">
+    <a class="nav-logo" href="#">Market<span style="color:var(--wave)">SN</span></a>
+    <span class="nav-tag">Flutter · Mobile</span>
+  </div>
+  <div class="nav-links">
+    <a href="#archi">Architecture</a>
+    <a href="#screens">Screens</a>
+    <a href="#payment">Wave API</a>
+    <a href="#backend">Backend</a>
+    <a href="#deploy">Deploy</a>
+  </div>
+  <a href="projet_marketsn.html" class="nav-cta">← Retour</a>
+</nav>
+
+<!-- ═══════ HERO ═══════ -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow">002 — Application Mobile · Sénégal</div>
+    <div class="hero-num"><span class="stroke">MKT</span></div>
+    <div class="hero-title-block">
+      <h1 class="hero-title">Market<span class="wave-word">SN</span></h1>
+    </div>
+    <p class="hero-sub">
+      Marketplace mobile <strong>made in Sénégal</strong> pour artisans, commerçants et vendeurs locaux.
+      Catalogue produits, panier intelligent, paiement via <strong>Wave &amp; Orange Money</strong>.
+      Backend <strong>Node.js + MongoDB</strong> déployé sur <strong>Railway &amp; Render</strong>.
+    </p>
+    <div class="hero-chips">
+      <span class="chip chip-flutter">🐦 Flutter 3.x</span>
+      <span class="chip chip-fire">🔥 Firebase</span>
+      <span class="chip chip-node">🟩 Node.js + Express</span>
+      <span class="chip chip-wave">💳 Wave API</span>
+      <span class="chip chip-mongo">🍃 MongoDB</span>
+      <span class="chip chip-rail">🚂 Railway</span>
+      <span class="chip chip-render">🌐 Render</span>
+    </div>
+    <div class="hero-ctas">
+      <a href="#screens" class="btn-dark">→ Voir les écrans</a>
+      <a href="#archi" class="btn-ghost">↓ Architecture</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <!-- Phone mockup -->
+    <div class="phone-device">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+        <div class="screen">
+          <div class="screen-nav">
+            <div class="screen-logo">Market<span>SN</span></div>
+            <div class="s-cart">🛒<div class="s-badge">3</div></div>
+          </div>
+          <div class="s-search">🔍 <span>Rechercher un produit...</span></div>
+          <div class="s-cats">
+            <div class="s-cat on">Tout</div>
+            <div class="s-cat">🎨 Artisanat</div>
+            <div class="s-cat">🥘 Food</div>
+            <div class="s-cat">👗 Mode</div>
+            <div class="s-cat">💍 Bijoux</div>
+          </div>
+          <div class="s-section-title">TENDANCE 🔥</div>
+          <div class="s-grid">
+            <div class="s-card">
+              <div class="s-card-img" style="background:#FFF0E8">🧵</div>
+              <div class="s-card-body">
+                <div class="s-card-name">Tissu Bazin Brodé</div>
+                <div class="s-card-shop">Artisanat Diallo</div>
+                <div class="s-card-foot">
+                  <div class="s-price">8 500 F</div>
+                  <div class="s-add">+</div>
+                </div>
+              </div>
+            </div>
+            <div class="s-card">
+              <div class="s-card-img" style="background:#E8F5E9">🍛</div>
+              <div class="s-card-body">
+                <div class="s-card-name">Thiéboudienne</div>
+                <div class="s-card-shop">Yaye Fatou</div>
+                <div class="s-card-foot">
+                  <div class="s-price">3 000 F</div>
+                  <div class="s-add">+</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="s-tab">
+            <div class="s-tab-item on"><div class="s-tab-icon">🏠</div>Accueil</div>
+            <div class="s-tab-item"><div class="s-tab-icon">🔍</div>Chercher</div>
+            <div class="s-tab-item"><div class="s-tab-icon">❤️</div>Favoris</div>
+            <div class="s-tab-item"><div class="s-tab-icon">🛒</div>Panier</div>
+            <div class="s-tab-item"><div class="s-tab-icon">👤</div>Profil</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Stats -->
+    <div class="hero-stats">
+      <div class="hs"><div class="hs-n">2.4K</div><div class="hs-l">VENDEURS</div></div>
+      <div class="hs"><div class="hs-n">18K</div><div class="hs-l">PRODUITS</div></div>
+      <div class="hs"><div class="hs-n">35K</div><div class="hs-l">USERS</div></div>
+      <div class="hs"><div class="hs-n">4.8★</div><div class="hs-l">PLAY STORE</div></div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ═══════ ARCHITECTURE ═══════ -->
+<section class="section" id="archi" style="background:var(--ink)">
+  <div style="position:relative;z-index:1">
+    <div class="section-label" style="color:var(--wave)">Architecture</div>
+    <h2 class="section-title" style="color:#fff">Stack <em>technique</em></h2>
+    <p class="section-desc" style="color:rgba(255,255,255,.55)">
+      Architecture <strong style="color:#fff">3 couches</strong> : application mobile Flutter,
+      API REST Node.js/Express hébergée sur Railway, base de données MongoDB Atlas.
+      Firebase gère l'authentification et les notifications push.
+    </p>
+
+    <div class="archi-diagram">
+      <!-- COUCHE 1 : Flutter -->
+      <div class="archi-layer">
+        <div class="archi-layer-tag">// COUCHE 1</div>
+        <div class="archi-layer-title">📱 Client</div>
+        <div class="archi-item">
+          <div class="archi-icon">🐦</div>
+          <div><div class="archi-item-title">Flutter 3.x / Dart</div><div class="archi-item-desc">UI multiplateforme Android & iOS. Provider pour la gestion d'état.</div></div>
+        </div>
+        <div class="archi-item">
+          <div class="archi-icon">🔥</div>
+          <div><div class="archi-item-title">Firebase Auth</div><div class="archi-item-desc">Authentification phone/email. Google Sign-In. Tokens JWT.</div></div>
+        </div>
+        <div class="archi-item">
+          <div class="archi-icon">📲</div>
+          <div><div class="archi-item-title">FCM Push</div><div class="archi-item-desc">Notifications commandes, livraisons, promos en temps réel.</div></div>
+        </div>
+        <div class="archi-item">
+          <div class="archi-icon">💾</div>
+          <div><div class="archi-item-title">Hive / SharedPref</div><div class="archi-item-desc">Cache local, panier offline, préférences utilisateur.</div></div>
+        </div>
+      </div>
+      <div class="archi-arrow">→</div>
+      <!-- COUCHE 2 : API -->
+      <div class="archi-layer">
+        <div class="archi-layer-tag">// COUCHE 2</div>
+        <div class="archi-layer-title">⚙️ API</div>
+        <div class="archi-item">
+          <div class="archi-icon">🟩</div>
+          <div><div class="archi-item-title">Node.js + Express</div><div class="archi-item-desc">API REST versionnée /api/v1. Middleware JWT. Rate limiting.</div></div>
+        </div>
+        <div class="archi-item">
+          <div class="archi-icon">💳</div>
+          <div><div class="archi-item-title">Wave API</div><div class="archi-item-desc">Intégration paiement mobile Wave Sénégal. Webhooks sécurisés.</div></div>
+        </div>
+        <div class="archi-item">
+          <div class="archi-icon">🚂</div>
+          <div><div class="archi-item-title">Railway Deploy</div><div class="archi-item-desc">CI/CD auto depuis GitHub. Env variables sécurisées. SSL gratuit.</div></div>
+        </div>
+        <div class="archi-item">
+          <div class="archi-icon">📦</div>
+          <div><div class="archi-item-title">Multer + Cloudinary</div><div class="archi-item-desc">Upload photos produits. Optimisation, redimensionnement auto.</div></div>
+        </div>
+      </div>
+      <div class="archi-arrow">→</div>
+      <!-- COUCHE 3 : Data -->
+      <div class="archi-layer">
+        <div class="archi-layer-tag">// COUCHE 3</div>
+        <div class="archi-layer-title">🗄️ Data</div>
+        <div class="archi-item">
+          <div class="archi-icon">🍃</div>
+          <div><div class="archi-item-title">MongoDB Atlas</div><div class="archi-item-desc">Base NoSQL. Schémas Mongoose. Index géospatiaux pour la livraison.</div></div>
+        </div>
+        <div class="archi-item">
+          <div class="archi-icon">🔥</div>
+          <div><div class="archi-item-title">Firestore (temps réel)</div><div class="archi-item-desc">Chat vendeur-acheteur. Statut commande en direct.</div></div>
+        </div>
+        <div class="archi-item">
+          <div class="archi-icon">🌐</div>
+          <div><div class="archi-item-title">Render (admin)</div><div class="archi-item-desc">Dashboard admin vendeurs déployé sur Render. Next.js + Prisma.</div></div>
+        </div>
+        <div class="archi-item">
+          <div class="archi-icon">🔴</div>
+          <div><div class="archi-item-title">Redis Cache</div><div class="archi-item-desc">Cache produits, sessions, rate-limiting. Upstash Redis serverless.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Code snippet Flutter -->
+    <div class="code-block" style="margin-top:2rem">
+      <div class="code-bar">
+        <div class="code-dot cd-r"></div>
+        <div class="code-dot cd-y"></div>
+        <div class="code-dot cd-g"></div>
+        <span class="code-filename">lib/services/payment_service.dart</span>
+      </div>
+      <div class="code-body">
+<span class="cc">// Service Wave API — Initier un paiement mobile</span>
+<span class="ck">import</span> <span class="cs">'package:http/http.dart'</span> <span class="ck">as</span> http;
+<span class="ck">import</span> <span class="cs">'package:flutter_dotenv/flutter_dotenv.dart'</span>;
+
+<span class="ck">class</span> <span class="cw">WavePaymentService</span> {
+  <span class="ck">static const</span> <span class="co">String</span> _baseUrl = <span class="cs">'https://api.wave.com/v1'</span>;
+
+  <span class="ck">static</span> <span class="co">Future</span>&lt;<span class="co">Map</span>&lt;<span class="co">String</span>, <span class="ck">dynamic</span>&gt;&gt; <span class="cf">initiatePayment</span>({
+    <span class="ck">required</span> <span class="co">double</span> amount,
+    <span class="ck">required</span> <span class="co">String</span> orderId,
+    <span class="ck">required</span> <span class="co">String</span> customerPhone,
+  }) <span class="ck">async</span> {
+    <span class="ck">final</span> response = <span class="ck">await</span> http.<span class="cf">post</span>(
+      Uri.<span class="cf">parse</span>(<span class="cs">'$_baseUrl/checkout/sessions'</span>),
+      headers: {
+        <span class="cs">'Authorization'</span>: <span class="cs">'Bearer </span><span class="cw">${dotenv.env['WAVE_API_KEY']}</span><span class="cs">'</span>,
+        <span class="cs">'Content-Type'</span>: <span class="cs">'application/json'</span>,
+      },
+      body: jsonEncode({
+        <span class="cs">'amount'</span>: amount,
+        <span class="cs">'currency'</span>: <span class="cs">'XOF'</span>,
+        <span class="cs">'client_reference'</span>: orderId,
+        <span class="cs">'success_url'</span>: <span class="cs">'marketsn://payment/success'</span>,
+        <span class="cs">'error_url'</span>:   <span class="cs">'marketsn://payment/error'</span>,
+      }),
+    );
+    <span class="ck">return</span> jsonDecode(response.body);
+  }
+}</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ═══════ FLUTTER STRUCTURE ═══════ -->
+<section class="section" id="structure">
+  <div class="section-label">Structure</div>
+  <h2 class="section-title">Projet <em>Flutter</em></h2>
+  <p class="section-desc">
+    Architecture <strong>Feature-First</strong> avec séparation claire UI / logique métier / data.
+    Gestion d'état via <strong>Provider</strong>. Navigation avec <strong>go_router</strong>.
+  </p>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem">
+    <div class="folder-tree">
+      <div class="ft-bar">
+        <div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div>
+        <span class="code-filename">marketsn/ — Structure du projet</span>
+      </div>
+      <div class="ft-body">
+        <div><span class="ft-folder">📁 marketsn_app/</span></div>
+        <div class="ft-indent1"><span class="ft-folder">📁 lib/</span></div>
+        <div class="ft-indent2"><span class="ft-folder">📁 core/</span></div>
+        <div class="ft-indent3"><span class="ft-dart">constants.dart</span></div>
+        <div class="ft-indent3"><span class="ft-dart">theme.dart</span></div>
+        <div class="ft-indent3"><span class="ft-dart">router.dart</span></div>
+        <div class="ft-indent2"><span class="ft-folder">📁 features/</span></div>
+        <div class="ft-indent3"><span class="ft-folder">📁 auth/</span></div>
+        <div class="ft-indent3"><span class="ft-comment">  ├── screens/ providers/ services/</span></div>
+        <div class="ft-indent3"><span class="ft-folder">📁 home/</span></div>
+        <div class="ft-indent3"><span class="ft-folder">📁 products/</span></div>
+        <div class="ft-indent3"><span class="ft-folder">📁 cart/</span></div>
+        <div class="ft-indent3"><span class="ft-folder">📁 orders/</span></div>
+        <div class="ft-indent3"><span class="ft-folder">📁 payment/</span></div>
+        <div class="ft-indent3"><span class="ft-folder">📁 seller/</span></div>
+        <div class="ft-indent3"><span class="ft-folder">📁 chat/</span></div>
+        <div class="ft-indent2"><span class="ft-folder">📁 shared/</span></div>
+        <div class="ft-indent3"><span class="ft-dart">widgets.dart</span></div>
+        <div class="ft-indent3"><span class="ft-dart">models.dart</span></div>
+        <div class="ft-indent2"><span class="ft-dart">main.dart</span></div>
+        <div class="ft-indent1"><span class="ft-yaml">pubspec.yaml</span></div>
+        <div class="ft-indent1"><span class="ft-json">.env</span></div>
+      </div>
+    </div>
+    <div class="code-block" style="margin-top:0">
+      <div class="code-bar">
+        <div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div>
+        <span class="code-filename">pubspec.yaml — Dépendances</span>
+      </div>
+      <div class="code-body">
+<span class="cf">dependencies</span>:
+  flutter: <span class="cs">">=3.0.0"</span>
+
+  <span class="cc"># State Management</span>
+  provider: <span class="cn">^6.1.0</span>
+  riverpod: <span class="cn">^2.4.0</span>
+
+  <span class="cc"># Navigation</span>
+  go_router: <span class="cn">^12.0.0</span>
+
+  <span class="cc"># Firebase</span>
+  firebase_core: <span class="cn">^2.24.0</span>
+  firebase_auth: <span class="cn">^4.15.0</span>
+  cloud_firestore: <span class="cn">^4.13.0</span>
+  firebase_messaging: <span class="cn">^14.7.0</span>
+  firebase_storage: <span class="cn">^11.5.0</span>
+
+  <span class="cc"># Network</span>
+  http: <span class="cn">^1.1.0</span>
+  dio: <span class="cn">^5.3.0</span>
+
+  <span class="cc"># Storage local</span>
+  hive_flutter: <span class="cn">^1.1.0</span>
+  shared_preferences: <span class="cn">^2.2.0</span>
+
+  <span class="cc"># UI / Utils</span>
+  cached_network_image: <span class="cn">^3.3.0</span>
+  image_picker: <span class="cn">^1.0.4</span>
+  url_launcher: <span class="cn">^6.2.0</span>
+  flutter_dotenv: <span class="cn">^5.1.0</span>
+  intl: <span class="cn">^0.18.0</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ═══════ SCREENS ═══════ -->
+<section class="section" id="screens" style="background:var(--bg2)">
+  <div class="section-label">UI · Dart / Flutter</div>
+  <h2 class="section-title">Écrans de <em>l'app</em></h2>
+  <p class="section-desc">
+    Toutes les vues de l'application mobile. Design system cohérent avec
+    <strong>Material 3</strong> personnalisé. Animations via <strong>flutter_animate</strong>.
+  </p>
+
+  <div class="screens-showcase">
+    <!-- Onboarding -->
+    <div class="screen-mock">
+      <div class="mock-phone">
+        <div class="mock-notch"></div>
+        <div class="mock-screen ms-onboard" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center">
+          <div style="font-size:40px;margin-bottom:12px">🛒</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#fff;letter-spacing:.04em;margin-bottom:6px">MarketSN</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.5);margin-bottom:20px">La marketplace du Sénégal</div>
+          <div style="width:100%;background:var(--wave);padding:10px;border-radius:8px;font-size:10px;font-weight:700;color:#fff;margin-bottom:8px">Commencer</div>
+          <div style="width:100%;border:1px solid rgba(255,255,255,.2);padding:10px;border-radius:8px;font-size:10px;color:rgba(255,255,255,.6)">Se connecter</div>
+          <div style="display:flex;gap:6px;margin-top:16px">
+            <div style="width:20px;height:4px;background:var(--wave);border-radius:2px"></div>
+            <div style="width:4px;height:4px;background:rgba(255,255,255,.3);border-radius:2px"></div>
+            <div style="width:4px;height:4px;background:rgba(255,255,255,.3);border-radius:2px"></div>
+          </div>
+        </div>
+      </div>
+      <div class="mock-label">ONBOARDING</div>
+    </div>
+    <!-- Home -->
+    <div class="screen-mock">
+      <div class="mock-phone">
+        <div class="mock-notch"></div>
+        <div class="mock-screen ms-home" style="font-family:var(--sans)">
+          <div style="padding:16px 12px 6px;display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div style="font-size:9px;color:#8A8A8A">Bonjour 👋</div>
+              <div style="font-size:11px;font-weight:700">Aminata Diallo</div>
+            </div>
+            <div style="font-size:16px;position:relative">🔔<div style="position:absolute;top:-3px;right:-3px;width:8px;height:8px;background:var(--fire);border-radius:50%"></div></div>
+          </div>
+          <div style="margin:6px 12px;background:#F0EEE8;border-radius:16px;padding:7px 12px;display:flex;align-items:center;gap:6px;font-size:9px;color:#8A8A8A">🔍 Rechercher...</div>
+          <div style="display:flex;gap:5px;padding:6px 12px;overflow:hidden">
+            <div style="flex-shrink:0;padding:4px 10px;background:var(--wave);color:#fff;border-radius:12px;font-size:8px;font-weight:700">Tout</div>
+            <div style="flex-shrink:0;padding:4px 8px;background:#F0EEE8;color:#6A6A6A;border-radius:12px;font-size:8px">🎨 Art.</div>
+            <div style="flex-shrink:0;padding:4px 8px;background:#F0EEE8;color:#6A6A6A;border-radius:12px;font-size:8px">🥘 Food</div>
+            <div style="flex-shrink:0;padding:4px 8px;background:#F0EEE8;color:#6A6A6A;border-radius:12px;font-size:8px">👗 Mode</div>
+          </div>
+          <div style="margin:6px 12px 4px;padding:10px;background:linear-gradient(135deg,var(--wave),#00968A);border-radius:10px">
+            <div style="font-size:8px;color:rgba(255,255,255,.8)">Vendeur du jour</div>
+            <div style="font-size:10px;font-weight:700;color:#fff">Artisanat Diallo</div>
+            <div style="font-size:8px;color:rgba(255,255,255,.7)">⭐ 4.9 · 342 ventes</div>
+          </div>
+          <div style="padding:4px 12px;font-size:9px;font-weight:700;color:#3A3A3A">Tendance 🔥</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:0 12px">
+            <div style="background:#fff;border-radius:8px;border:1px solid #F0EEE8">
+              <div style="height:44px;display:flex;align-items:center;justify-content:center;font-size:20px;background:#FFF0E8;border-radius:8px 8px 0 0">🧵</div>
+              <div style="padding:5px 6px">
+                <div style="font-size:8px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Tissu Bazin</div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px">
+                  <div style="font-size:9px;font-weight:700;color:var(--wave)">8 500 F</div>
+                  <div style="width:14px;height:14px;background:var(--wave);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:700">+</div>
+                </div>
+              </div>
+            </div>
+            <div style="background:#fff;border-radius:8px;border:1px solid #F0EEE8">
+              <div style="height:44px;display:flex;align-items:center;justify-content:center;font-size:20px;background:#E8F5E9;border-radius:8px 8px 0 0">🍛</div>
+              <div style="padding:5px 6px">
+                <div style="font-size:8px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Thiéboudienne</div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px">
+                  <div style="font-size:9px;font-weight:700;color:var(--wave)">3 000 F</div>
+                  <div style="width:14px;height:14px;background:var(--wave);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:700">+</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mock-label">HOME</div>
+    </div>
+    <!-- Produit detail -->
+    <div class="screen-mock">
+      <div class="mock-phone">
+        <div class="mock-notch"></div>
+        <div class="mock-screen ms-prod" style="font-family:var(--sans)">
+          <div style="height:110px;background:linear-gradient(135deg,#FFF0E8,#FFE4D0);display:flex;align-items:center;justify-content:center;font-size:50px;position:relative">
+            🧵
+            <div style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,.5);color:#fff;border-radius:20px;padding:3px 8px;font-size:8px">←</div>
+            <div style="position:absolute;top:8px;right:8px;font-size:14px">❤️</div>
+          </div>
+          <div style="padding:10px 12px">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">
+              <div>
+                <div style="font-size:12px;font-weight:700">Tissu Bazin Brodé Premium</div>
+                <div style="font-size:9px;color:#8A8A8A">Artisanat Diallo · ⭐ 4.9</div>
+              </div>
+              <div style="font-size:13px;font-weight:700;color:var(--wave)">8 500 F</div>
+            </div>
+            <div style="font-size:8px;color:#6A6A6A;line-height:1.6;margin-bottom:8px">Tissu bazin de haute qualité, brodé à la main par nos artisans. Disponible en plusieurs couleurs...</div>
+            <div style="display:flex;gap:6px;margin-bottom:10px">
+              <div style="padding:4px 8px;border:1.5px solid var(--wave);border-radius:16px;font-size:8px;color:var(--wave);font-weight:700">🟢 Or</div>
+              <div style="padding:4px 8px;border:1px solid #E0E0E0;border-radius:16px;font-size:8px;color:#8A8A8A">🔵 Bleu</div>
+              <div style="padding:4px 8px;border:1px solid #E0E0E0;border-radius:16px;font-size:8px;color:#8A8A8A">🔴 Rouge</div>
+            </div>
+            <div style="display:flex;gap:6px">
+              <div style="flex:1;background:var(--wave);color:#fff;padding:9px;border-radius:8px;font-size:9px;font-weight:700;text-align:center">Ajouter au panier</div>
+              <div style="border:1px solid #E0E0E0;padding:9px 10px;border-radius:8px;font-size:11px">💬</div>
+            </div>
+            <div style="margin-top:8px;padding:8px;background:#F8F8F6;border-radius:8px;display:flex;align-items:center;gap:8px">
+              <div style="font-size:16px">🚴</div>
+              <div><div style="font-size:9px;font-weight:700">Livraison Dakar</div><div style="font-size:8px;color:#8A8A8A">1 500 F · 2-3h</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mock-label">PRODUIT</div>
+    </div>
+    <!-- Panier -->
+    <div class="screen-mock">
+      <div class="mock-phone">
+        <div class="mock-notch"></div>
+        <div class="mock-screen ms-cart" style="font-family:var(--sans)">
+          <div style="padding:16px 12px 8px;display:flex;align-items:center;gap:8px">
+            <div style="font-size:9px">←</div>
+            <div style="font-size:12px;font-weight:700">Mon Panier (3)</div>
+          </div>
+          <div style="padding:0 12px;display:flex;flex-direction:column;gap:6px">
+            <div style="background:#fff;border-radius:8px;border:1px solid #F0EEE8;padding:8px;display:flex;gap:8px;align-items:center">
+              <div style="width:36px;height:36px;background:#FFF0E8;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🧵</div>
+              <div style="flex:1">
+                <div style="font-size:9px;font-weight:700">Tissu Bazin</div>
+                <div style="font-size:10px;font-weight:700;color:var(--wave)">8 500 F</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px">
+                <div style="width:18px;height:18px;border-radius:4px;border:1px solid #E0E0E0;display:flex;align-items:center;justify-content:center;font-size:10px">−</div>
+                <div style="font-size:10px;font-weight:700">1</div>
+                <div style="width:18px;height:18px;border-radius:4px;background:var(--wave);display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff">+</div>
+              </div>
+            </div>
+            <div style="background:#fff;border-radius:8px;border:1px solid #F0EEE8;padding:8px;display:flex;gap:8px;align-items:center">
+              <div style="width:36px;height:36px;background:#E8F5E9;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🍛</div>
+              <div style="flex:1">
+                <div style="font-size:9px;font-weight:700">Thiéboudienne</div>
+                <div style="font-size:10px;font-weight:700;color:var(--wave)">3 000 F</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px">
+                <div style="width:18px;height:18px;border-radius:4px;border:1px solid #E0E0E0;display:flex;align-items:center;justify-content:center;font-size:10px">−</div>
+                <div style="font-size:10px;font-weight:700">2</div>
+                <div style="width:18px;height:18px;border-radius:4px;background:var(--wave);display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff">+</div>
+              </div>
+            </div>
+          </div>
+          <div style="position:absolute;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #F0EEE8;padding:10px 12px">
+            <div style="display:flex;justify-content:space-between;font-size:9px;color:#6A6A6A;margin-bottom:4px"><span>Sous-total</span><span>14 500 F</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:9px;color:#6A6A6A;margin-bottom:6px"><span>Livraison</span><span>1 500 F</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:700;margin-bottom:8px"><span>TOTAL</span><span style="color:var(--wave)">16 000 F</span></div>
+            <div style="background:var(--wave);color:#fff;padding:9px;border-radius:8px;font-size:9px;font-weight:700;text-align:center">Passer au paiement →</div>
+          </div>
+        </div>
+      </div>
+      <div class="mock-label">PANIER</div>
+    </div>
+    <!-- Paiement Wave -->
+    <div class="screen-mock">
+      <div class="mock-phone">
+        <div class="mock-notch"></div>
+        <div class="mock-screen ms-pay" style="font-family:var(--sans);padding:16px 12px">
+          <div style="font-size:12px;font-weight:700;margin-bottom:12px">💳 Paiement</div>
+          <div style="background:#fff;border-radius:10px;padding:12px;margin-bottom:8px;border:2px solid var(--wave)">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+              <div style="font-size:20px">📱</div>
+              <div><div style="font-size:11px;font-weight:700;color:var(--wave)">Wave</div><div style="font-size:8px;color:#8A8A8A">Paiement mobile</div></div>
+              <div style="margin-left:auto;width:14px;height:14px;border-radius:50%;border:2px solid var(--wave);display:flex;align-items:center;justify-content:center;font-size:8px;color:var(--wave)">✓</div>
+            </div>
+            <div style="background:#F0FDF8;border-radius:6px;padding:8px;text-align:center">
+              <div style="font-size:8px;color:#8A8A8A">Total à payer</div>
+              <div style="font-size:18px;font-weight:700;color:var(--wave)">16 000 F</div>
+            </div>
+          </div>
+          <div style="background:#fff;border-radius:10px;padding:10px;margin-bottom:8px;border:1px solid #E0E0E0;display:flex;align-items:center;gap:8px">
+            <div style="font-size:20px">🟠</div>
+            <div><div style="font-size:10px;font-weight:700">Orange Money</div><div style="font-size:8px;color:#8A8A8A">Disponible</div></div>
+          </div>
+          <div style="background:#fff;border-radius:10px;padding:10px;margin-bottom:12px;border:1px solid #E0E0E0;display:flex;align-items:center;gap:8px">
+            <div style="font-size:20px">💳</div>
+            <div><div style="font-size:10px;font-weight:700">Carte bancaire</div><div style="font-size:8px;color:#8A8A8A">Visa / Mastercard</div></div>
+          </div>
+          <div style="background:var(--wave);color:#fff;padding:11px;border-radius:8px;font-size:10px;font-weight:700;text-align:center">Payer 16 000 F via Wave →</div>
+          <div style="font-size:8px;color:#8A8A8A;text-align:center;margin-top:8px">🔒 Paiement sécurisé · SSL · Wave API</div>
+        </div>
+      </div>
+      <div class="mock-label">PAIEMENT WAVE</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ═══════ WAVE API ═══════ -->
+<section class="section" id="payment" style="background:var(--wave-light)">
+  <div class="section-label">Paiement</div>
+  <h2 class="section-title">Intégration <em>Wave API</em></h2>
+  <p class="section-desc">
+    L'API Wave permet d'initier des paiements mobile directement depuis Flutter.
+    <strong>Checkout sessions</strong>, webhooks de confirmation, et remboursements automatiques.
+  </p>
+  <div class="pay-grid">
+    <div>
+      <div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:1.25rem;display:flex;align-items:center;gap:8px">⚡ Flux de paiement Wave</div>
+      <div class="pay-flow">
+        <div class="pay-step">
+          <div class="pay-step-num">1</div>
+          <div><div class="pay-step-title">User tape "Payer avec Wave"</div><div class="pay-step-desc">Flutter envoie une requête à l'API Node.js avec le montant et l'orderId.</div></div>
+        </div>
+        <div class="pay-step">
+          <div class="pay-step-num">2</div>
+          <div><div class="pay-step-title">Node.js crée une Checkout Session</div><div class="pay-step-desc">POST /v1/checkout/sessions → Wave API retourne une URL de paiement unique.</div></div>
+        </div>
+        <div class="pay-step">
+          <div class="pay-step-num">3</div>
+          <div><div class="pay-step-title">Redirect vers Wave</div><div class="pay-step-desc">Flutter ouvre l'URL Wave via url_launcher. L'utilisateur confirme sur son app Wave.</div></div>
+        </div>
+        <div class="pay-step">
+          <div class="pay-step-num">4</div>
+          <div><div class="pay-step-title">Webhook confirmation</div><div class="pay-step-desc">Wave envoie un POST webhook à notre API. On vérifie la signature HMAC-SHA256.</div></div>
+        </div>
+        <div class="pay-step">
+          <div class="pay-step-num">5</div>
+          <div><div class="pay-step-title">Commande validée</div><div class="pay-step-desc">MongoDB mis à jour. FCM notification envoyée au buyer et au seller. Deep link vers MarketSN.</div></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:13px;font-weight:700;color:var(--ink);margin-bottom:1.25rem">💳 Méthodes de paiement</div>
+      <div class="pay-methods">
+        <div class="pay-method" onclick="showToast('Wave API configurée ✅')">
+          <div class="pay-method-icon">📱</div>
+          <div><div class="pay-method-name">Wave</div><div class="pay-method-desc">Paiement mobile Wave Sénégal. Checkout API. Webhooks. 0% frais vendeur.</div></div>
+          <span class="pay-method-badge badge-wave">PRINCIPAL</span>
+        </div>
+        <div class="pay-method" onclick="showToast('Orange Money via API tierce')">
+          <div class="pay-method-icon">🟠</div>
+          <div><div class="pay-method-name">Orange Money</div><div class="pay-method-desc">Via agrégateur CinetPay. USSD & mobile app. Disponible 24/7.</div></div>
+          <span class="pay-method-badge badge-om">DISPONIBLE</span>
+        </div>
+        <div class="pay-method" onclick="showToast('Stripe pour cartes internationales')">
+          <div class="pay-method-icon">💳</div>
+          <div><div class="pay-method-name">Carte bancaire</div><div class="pay-method-desc">Stripe API. Visa, Mastercard. Clients diaspora et entreprises.</div></div>
+          <span class="pay-method-badge badge-card">STRIPE</span>
+        </div>
+        <div class="pay-method" onclick="showToast('Cash géré côté livreur')">
+          <div class="pay-method-icon">💵</div>
+          <div><div class="pay-method-name">Cash à la livraison</div><div class="pay-method-desc">Paiement au livreur. Confirmation automatique par le livreur dans l'app.</div></div>
+          <span class="pay-method-badge" style="background:#F3F4F6;color:#374151">COD</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Code webhook -->
+  <div class="code-block" style="margin-top:2rem">
+    <div class="code-bar">
+      <div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div>
+      <span class="code-filename">routes/payment.routes.js — Webhook Wave</span>
+    </div>
+    <div class="code-body">
+<span class="cc">// Vérification signature webhook Wave (HMAC-SHA256)</span>
+<span class="ck">const</span> <span class="cf">verifyWaveWebhook</span> = (req, res, next) => {
+  <span class="ck">const</span> signature = req.headers[<span class="cs">'wave-signature'</span>];
+  <span class="ck">const</span> secret    = process.env.<span class="co">WAVE_WEBHOOK_SECRET</span>;
+  <span class="ck">const</span> payload   = JSON.stringify(req.body);
+  <span class="ck">const</span> expected  = crypto
+    .<span class="cf">createHmac</span>(<span class="cs">'sha256'</span>, secret)
+    .<span class="cf">update</span>(payload)
+    .<span class="cf">digest</span>(<span class="cs">'hex'</span>);
+
+  <span class="ck">if</span> (signature !== <span class="cs">`sha256=</span><span class="cw">${expected}</span><span class="cs">`</span>) {
+    <span class="ck">return</span> res.<span class="cf">status</span>(<span class="cn">401</span>).<span class="cf">json</span>({ error: <span class="cs">'Invalid signature'</span> });
+  }
+  <span class="cf">next</span>();
+};
+
+<span class="cc">// Handler webhook paiement réussi</span>
+router.<span class="cf">post</span>(<span class="cs">'/webhook/wave'</span>, verifyWaveWebhook, <span class="ck">async</span> (req, res) => {
+  <span class="ck">const</span> { event, data } = req.body;
+
+  <span class="ck">if</span> (event === <span class="cs">'checkout.session.completed'</span>) {
+    <span class="ck">const</span> order = <span class="ck">await</span> Order.<span class="cf">findOneAndUpdate</span>(
+      { _id: data.client_reference },
+      { status: <span class="cs">'paid'</span>, paymentId: data.id },
+      { <span class="ck">new</span>: <span class="ck">true</span> }
+    );
+    <span class="cc">// Notifier buyer + seller via FCM</span>
+    <span class="ck">await</span> <span class="cf">sendPushNotification</span>(order.buyerId, {
+      title: <span class="cs">'Paiement confirmé ✅'</span>,
+      body:  <span class="cs">`Commande #</span><span class="cw">${order._id}</span><span class="cs"> payée via Wave`</span>
+    });
+  }
+  res.<span class="cf">json</span>({ received: <span class="ck">true</span> });
+});
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ═══════ BACKEND ═══════ -->
+<section class="section" id="backend">
+  <div class="section-label">API REST</div>
+  <h2 class="section-title">Node.js + <em>Express</em></h2>
+  <p class="section-desc">
+    API REST versionnée <strong>/api/v1</strong>. Authentification JWT + Firebase. 
+    Validation Joi. Rate limiting. Hébergée sur <strong>Railway</strong>.
+  </p>
+
+  <div class="backend-grid">
+    <!-- Routes -->
+    <div class="backend-card">
+      <div class="bc-header">
+        <div class="bc-icon">🟩</div>
+        <div><div class="bc-title">Routes API</div><div class="bc-sub">Express Router · /api/v1</div></div>
+      </div>
+      <div class="bc-body">
+        <div class="api-route"><span class="method m-post">POST</span><span class="route-path">/auth/register</span><span class="route-desc">Inscription</span></div>
+        <div class="api-route"><span class="method m-post">POST</span><span class="route-path">/auth/login</span><span class="route-desc">Connexion JWT</span></div>
+        <div class="api-route"><span class="method m-get">GET</span><span class="route-path">/products</span><span class="route-desc">Liste + filtres</span></div>
+        <div class="api-route"><span class="method m-get">GET</span><span class="route-path">/products/:id</span><span class="route-desc">Détail produit</span></div>
+        <div class="api-route"><span class="method m-post">POST</span><span class="route-path">/products</span><span class="route-desc">Créer produit</span></div>
+        <div class="api-route"><span class="method m-put">PUT</span><span class="route-path">/products/:id</span><span class="route-desc">Modifier produit</span></div>
+        <div class="api-route"><span class="method m-post">POST</span><span class="route-path">/orders</span><span class="route-desc">Passer commande</span></div>
+        <div class="api-route"><span class="method m-get">GET</span><span class="route-path">/orders/me</span><span class="route-desc">Mes commandes</span></div>
+        <div class="api-route"><span class="method m-post">POST</span><span class="route-path">/payment/wave</span><span class="route-desc">Init paiement Wave</span></div>
+        <div class="api-route"><span class="method m-post">POST</span><span class="route-path">/webhook/wave</span><span class="route-desc">Confirmation Wave</span></div>
+        <div class="api-route"><span class="method m-get">GET</span><span class="route-path">/sellers/:id</span><span class="route-desc">Profil vendeur</span></div>
+        <div class="api-route"><span class="method m-delete">DEL</span><span class="route-path">/products/:id</span><span class="route-desc">Supprimer produit</span></div>
+      </div>
+    </div>
+    <!-- MongoDB Schemas -->
+    <div class="backend-card">
+      <div class="bc-header">
+        <div class="bc-icon">🍃</div>
+        <div><div class="bc-title">Schéma MongoDB</div><div class="bc-sub">Mongoose · Atlas</div></div>
+      </div>
+      <div class="bc-body">
+        <div style="font-size:11px;font-weight:700;color:var(--mongo);margin-bottom:.5rem;font-family:var(--mono)">// Model: Product</div>
+        <div class="schema-field"><span class="field-name">_id</span><span class="field-type">ObjectId</span><span class="field-desc">Auto-généré</span></div>
+        <div class="schema-field"><span class="field-name">name</span><span class="field-type">String</span><span class="field-desc">required · trim</span></div>
+        <div class="schema-field"><span class="field-name">price</span><span class="field-type">Number</span><span class="field-desc">en Francs CFA</span></div>
+        <div class="schema-field"><span class="field-name">images</span><span class="field-type">[String]</span><span class="field-desc">URLs Cloudinary</span></div>
+        <div class="schema-field"><span class="field-name">category</span><span class="field-type">String</span><span class="field-desc">enum catégories</span></div>
+        <div class="schema-field"><span class="field-name">seller</span><span class="field-type">ref:User</span><span class="field-desc">populate vendeur</span></div>
+        <div class="schema-field"><span class="field-name">stock</span><span class="field-type">Number</span><span class="field-desc">default: 0</span></div>
+        <div class="schema-field"><span class="field-name">location</span><span class="field-type">GeoJSON</span><span class="field-desc">Index géospatial</span></div>
+        <div class="schema-field"><span class="field-name">rating</span><span class="field-type">Number</span><span class="field-desc">avg avis</span></div>
+        <div class="schema-field"><span class="field-name">createdAt</span><span class="field-type">Date</span><span class="field-desc">timestamps: true</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Code Node.js -->
+  <div class="code-block">
+    <div class="code-bar">
+      <div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div>
+      <span class="code-filename">server.js — Point d'entrée Node.js + Express</span>
+    </div>
+    <div class="code-body">
+<span class="ck">const</span> express    = <span class="cf">require</span>(<span class="cs">'express'</span>);
+<span class="ck">const</span> mongoose   = <span class="cf">require</span>(<span class="cs">'mongoose'</span>);
+<span class="ck">const</span> cors        = <span class="cf">require</span>(<span class="cs">'cors'</span>);
+<span class="ck">const</span> rateLimit   = <span class="cf">require</span>(<span class="cs">'express-rate-limit'</span>);
+<span class="ck">require</span>(<span class="cs">'dotenv'</span>).<span class="cf">config</span>();
+
+<span class="ck">const</span> app = <span class="cf">express</span>();
+
+<span class="cc">// Middlewares globaux</span>
+app.<span class="cf">use</span>(<span class="cf">cors</span>({ origin: process.env.<span class="co">ALLOWED_ORIGINS</span>.<span class="cf">split</span>(<span class="cs">','</span>) }));
+app.<span class="cf">use</span>(express.<span class="cf">json</span>({ limit: <span class="cs">'10mb'</span> }));
+app.<span class="cf">use</span>(<span class="cf">rateLimit</span>({ windowMs: <span class="cn">15</span> * <span class="cn">60</span> * <span class="cn">1000</span>, max: <span class="cn">100</span> }));
+
+<span class="cc">// Connexion MongoDB Atlas</span>
+mongoose.<span class="cf">connect</span>(process.env.<span class="co">MONGODB_URI</span>)
+  .<span class="cf">then</span>(() => console.<span class="cf">log</span>(<span class="cs">'✅ MongoDB Atlas connecté'</span>))
+  .<span class="cf">catch</span>(err => console.<span class="cf">error</span>(<span class="cs">'❌'</span>, err));
+
+<span class="cc">// Routes</span>
+app.<span class="cf">use</span>(<span class="cs">'/api/v1/auth'</span>,    <span class="cf">require</span>(<span class="cs">'./routes/auth'</span>));
+app.<span class="cf">use</span>(<span class="cs">'/api/v1/products'</span>, <span class="cf">require</span>(<span class="cs">'./routes/products'</span>));
+app.<span class="cf">use</span>(<span class="cs">'/api/v1/orders'</span>,   <span class="cf">require</span>(<span class="cs">'./routes/orders'</span>));
+app.<span class="cf">use</span>(<span class="cs">'/api/v1/payment'</span>,  <span class="cf">require</span>(<span class="cs">'./routes/payment'</span>));
+app.<span class="cf">use</span>(<span class="cs">'/api/v1/sellers'</span>,  <span class="cf">require</span>(<span class="cs">'./routes/sellers'</span>));
+
+app.<span class="cf">listen</span>(process.env.<span class="co">PORT</span> || <span class="cn">3000</span>, () =>
+  console.<span class="cf">log</span>(<span class="cs">`🚀 API MarketSN sur le port </span><span class="cw">${process.env.PORT}</span><span class="cs">`</span>)
+);
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ═══════ FIREBASE ═══════ -->
+<section class="section" id="firebase" style="background:var(--fire-light)">
+  <div class="section-label">Firebase</div>
+  <h2 class="section-title">Auth + Push + <em>Temps réel</em></h2>
+  <p class="section-desc">
+    Firebase gère l'authentification, les notifications push FCM
+    et le chat vendeur-acheteur via Firestore en temps réel.
+  </p>
+  <div class="fire-grid">
+    <div class="fire-card">
+      <span class="fire-card-icon">🔐</span>
+      <div class="fire-card-title">Firebase Authentication</div>
+      <div class="fire-card-desc">Authentification multi-méthodes. Tokens JWT vérifiés côté API Node.js.</div>
+      <div class="fire-feature">Email + Mot de passe</div>
+      <div class="fire-feature">Numéro de téléphone (OTP SMS)</div>
+      <div class="fire-feature">Google Sign-In</div>
+      <div class="fire-feature">Refresh tokens sécurisés</div>
+    </div>
+    <div class="fire-card">
+      <span class="fire-card-icon">📲</span>
+      <div class="fire-card-title">Cloud Messaging (FCM)</div>
+      <div class="fire-card-desc">Notifications push Android & iOS. Topics pour promos, alertes stock.</div>
+      <div class="fire-feature">Commande confirmée</div>
+      <div class="fire-feature">Livraison en route</div>
+      <div class="fire-feature">Message vendeur reçu</div>
+      <div class="fire-feature">Promo flash géociblée</div>
+    </div>
+    <div class="fire-card">
+      <span class="fire-card-icon">💬</span>
+      <div class="fire-card-title">Firestore — Chat temps réel</div>
+      <div class="fire-card-desc">Messagerie acheteur-vendeur synchronisée en temps réel via streams Flutter.</div>
+      <div class="fire-feature">StreamBuilder Dart natif</div>
+      <div class="fire-feature">Messages lus / non lus</div>
+      <div class="fire-feature">Partage photos produits</div>
+      <div class="fire-feature">Security Rules strictes</div>
+    </div>
+    <div class="fire-card">
+      <span class="fire-card-icon">☁️</span>
+      <div class="fire-card-title">Cloud Storage</div>
+      <div class="fire-card-desc">Stockage photos profil, photos produits temporaires, documents vendeurs.</div>
+      <div class="fire-feature">Upload depuis image_picker</div>
+      <div class="fire-feature">CDN mondial Google</div>
+      <div class="fire-feature">Rules par userId</div>
+      <div class="fire-feature">Max 10 MB par image</div>
+    </div>
+    <div class="fire-card">
+      <span class="fire-card-icon">📊</span>
+      <div class="fire-card-title">Analytics + Crashlytics</div>
+      <div class="fire-card-desc">Suivi comportement utilisateurs, entonnoirs de conversion, rapports de crash.</div>
+      <div class="fire-feature">Events custom (add_to_cart)</div>
+      <div class="fire-feature">Crash reports temps réel</div>
+      <div class="fire-feature">A/B Testing</div>
+      <div class="fire-feature">Remote Config</div>
+    </div>
+    <div class="fire-card">
+      <span class="fire-card-icon">⚙️</span>
+      <div class="fire-card-title">Cloud Functions</div>
+      <div class="fire-card-desc">Fonctions serverless déclenchées par événements Firebase ou HTTP.</div>
+      <div class="fire-feature">onOrderCreated → email</div>
+      <div class="fire-feature">Calcul score vendeur</div>
+      <div class="fire-feature">Cleanup données</div>
+      <div class="fire-feature">Webhooks entrants</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ═══════ DEPLOY ═══════ -->
+<section class="section" id="deploy" style="background:var(--ink)">
+  <div class="section-label" style="color:var(--wave)">Déploiement</div>
+  <h2 class="section-title" style="color:#fff">Railway + <em>Render</em></h2>
+  <p class="section-desc" style="color:rgba(255,255,255,.55)">
+    Backend API déployé sur <strong style="color:#fff">Railway</strong> avec CI/CD GitHub.
+    Dashboard admin vendeurs sur <strong style="color:#fff">Render</strong>.
+    MongoDB Atlas et Redis Upstash en serverless.
+  </p>
+
+  <div class="deploy-grid">
+    <div class="deploy-card">
+      <div class="dc-head">
+        <div class="bc-icon">🚂</div>
+        <div><div class="dc-title">Railway</div><div class="dc-sub">API Node.js + Express</div></div>
+        <span class="dc-badge db-rail">BACKEND</span>
+      </div>
+      <div class="dc-body">
+        <div class="dc-item">Deploy auto depuis GitHub main branch</div>
+        <div class="dc-item">Variables d'env sécurisées (WAVE_API_KEY, JWT_SECRET…)</div>
+        <div class="dc-item">SSL/HTTPS automatique</div>
+        <div class="dc-item">Custom domain api.marketsn.sn</div>
+        <div class="dc-item">Logs en temps réel</div>
+        <div class="dc-item">Scaling horizontal auto</div>
+        <div class="dc-item">Health checks toutes les 30s</div>
+      </div>
+    </div>
+    <div class="deploy-card">
+      <div class="dc-head">
+        <div class="bc-icon">🌐</div>
+        <div><div class="dc-title">Render</div><div class="dc-sub">Dashboard admin vendeurs</div></div>
+        <span class="dc-badge db-render">ADMIN</span>
+      </div>
+      <div class="dc-body">
+        <div class="dc-item">Next.js — Dashboard admin vendeurs</div>
+        <div class="dc-item">Render Web Service gratuit (dev)</div>
+        <div class="dc-item">Build auto depuis GitHub</div>
+        <div class="dc-item">CDN statique pour assets</div>
+        <div class="dc-item">admin.marketsn.sn</div>
+        <div class="dc-item">Preview deployments PR</div>
+        <div class="dc-item">Rollback en 1 clic</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CI/CD Flow -->
+  <div class="deploy-flow">
+    <div class="df-title">Pipeline CI/CD automatisé</div>
+    <div class="df-steps">
+      <div class="df-step"><div class="df-step-icon">💻</div><div class="df-step-label">git push<br>main</div></div>
+      <div class="df-arrow">→</div>
+      <div class="df-step"><div class="df-step-icon">🐙</div><div class="df-step-label">GitHub<br>Actions</div></div>
+      <div class="df-arrow">→</div>
+      <div class="df-step"><div class="df-step-icon">🧪</div><div class="df-step-label">Tests<br>Jest</div></div>
+      <div class="df-arrow">→</div>
+      <div class="df-step"><div class="df-step-icon">🐋</div><div class="df-step-label">Docker<br>Build</div></div>
+      <div class="df-arrow">→</div>
+      <div class="df-step"><div class="df-step-icon">🚂</div><div class="df-step-label">Railway<br>Deploy</div></div>
+      <div class="df-arrow">→</div>
+      <div class="df-step"><div class="df-step-icon">✅</div><div class="df-step-label">Health<br>Check</div></div>
+      <div class="df-arrow">→</div>
+      <div class="df-step"><div class="df-step-icon">🔔</div><div class="df-step-label">Slack<br>Notif</div></div>
+    </div>
+  </div>
+
+  <!-- .env config -->
+  <div class="code-block" style="margin-top:2rem">
+    <div class="code-bar">
+      <div class="code-dot cd-r"></div><div class="code-dot cd-y"></div><div class="code-dot cd-g"></div>
+      <span class="code-filename">.env — Variables d'environnement Railway</span>
+    </div>
+    <div class="code-body">
+<span class="cc"># === MongoDB Atlas ===</span>
+<span class="co">MONGODB_URI</span>=<span class="cs">mongodb+srv://marketsn:&lt;pwd&gt;@cluster0.mongodb.net/marketsn</span>
+
+<span class="cc"># === Wave API ===</span>
+<span class="co">WAVE_API_KEY</span>=<span class="cs">wave_sn_prod_XXXXXXXXXXXXXXXX</span>
+<span class="co">WAVE_WEBHOOK_SECRET</span>=<span class="cs">whsec_XXXXXXXXXXXXXXXX</span>
+<span class="co">WAVE_BASE_URL</span>=<span class="cs">https://api.wave.com/v1</span>
+
+<span class="cc"># === Firebase Admin SDK ===</span>
+<span class="co">FIREBASE_PROJECT_ID</span>=<span class="cs">marketsn-app</span>
+<span class="co">FIREBASE_PRIVATE_KEY</span>=<span class="cs">"-----BEGIN RSA PRIVATE KEY-----..."</span>
+<span class="co">FIREBASE_CLIENT_EMAIL</span>=<span class="cs">firebase-adminsdk@marketsn-app.iam.gserviceaccount.com</span>
+
+<span class="cc"># === JWT ===</span>
+<span class="co">JWT_SECRET</span>=<span class="cs">super_secure_secret_marketsn_2026</span>
+<span class="co">JWT_EXPIRES</span>=<span class="cs">7d</span>
+
+<span class="cc"># === Cloudinary (images produits) ===</span>
+<span class="co">CLOUDINARY_URL</span>=<span class="cs">cloudinary://api_key:api_secret@marketsn</span>
+
+<span class="cc"># === Redis Upstash ===</span>
+<span class="co">REDIS_URL</span>=<span class="cs">rediss://default:token@region.upstash.io:6379</span>
+
+<span class="cc"># === App ===</span>
+<span class="co">PORT</span>=<span class="cs">3000</span>
+<span class="co">NODE_ENV</span>=<span class="cs">production</span>
+<span class="co">ALLOWED_ORIGINS</span>=<span class="cs">https://admin.marketsn.sn,marketsn://</span>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ═══════ FEATURES ═══════ -->
+<section class="section" id="features">
+  <div class="section-label">Fonctionnalités</div>
+  <h2 class="section-title">Ce que <em>MarketSN</em> fait</h2>
+  <div class="feat-grid">
+    <div class="feat-card">
+      <div class="feat-num">01 // CATALOG</div>
+      <span class="feat-icon">🏪</span>
+      <div class="feat-title">Boutique Vendeur</div>
+      <div class="feat-desc">Chaque vendeur crée sa boutique en 5 min. Catalogue illimité, gestion photos via Cloudinary, stock temps réel. Approbation admin automatique.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-num">02 // PAYMENT</div>
+      <span class="feat-icon">💳</span>
+      <div class="feat-title">Wave & Orange Money</div>
+      <div class="feat-desc">Paiement mobile sénégalais natif via Wave API. Webhooks sécurisés HMAC. Confirmation instantanée. Remboursement automatique si échec.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-num">03 // DELIVERY</div>
+      <span class="feat-icon">🚴</span>
+      <div class="feat-title">Suivi livraison GPS</div>
+      <div class="feat-desc">Réseau livreurs partenaires. Suivi GPS temps réel via Firestore. Notifications push à chaque étape. Zone couverte : Dakar + Banlieue.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-num">04 // CHAT</div>
+      <span class="feat-icon">💬</span>
+      <div class="feat-title">Messagerie temps réel</div>
+      <div class="feat-desc">Chat acheteur-vendeur via Firestore StreamBuilder. Photos, négociation prix, coordination livraison. Historique complet.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-num">05 // AUTH</div>
+      <span class="feat-icon">🔐</span>
+      <div class="feat-title">Auth sécurisée</div>
+      <div class="feat-desc">Firebase Auth multi-méthodes. OTP par SMS. JWT sécurisé côté API. Rôles (acheteur / vendeur / admin). Vérification KYC vendeur.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-num">06 // SELLER</div>
+      <span class="feat-icon">📊</span>
+      <div class="feat-title">Dashboard Vendeur</div>
+      <div class="feat-desc">Analytics ventes, revenus journaliers, produits les + vus, avis clients. Gestion commandes entrantes. Déployé sur Render.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ FOOTER ═══════ -->
+<footer>
+  <div>
+    <div class="footer-brand">Market<span>SN</span></div>
+    <div class="footer-meta">Développé par <strong>Cheikh Tidiane Mbow</strong> · Dakar, Sénégal 🇸🇳</div>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+    <span class="chip chip-flutter" style="cursor:default">🐦 Flutter</span>
+    <span class="chip chip-fire" style="cursor:default">🔥 Firebase</span>
+    <span class="chip chip-node" style="cursor:default">🟩 Node.js</span>
+    <span class="chip chip-wave" style="cursor:default">💳 Wave API</span>
+    <span class="chip chip-mongo" style="cursor:default">🍃 MongoDB</span>
+    <span class="chip chip-rail" style="cursor:default">🚂 Railway</span>
+    <span class="chip chip-render" style="cursor:default">🌐 Render</span>
+  </div>
+  <a href="projet_marketsn.html" class="footer-back">← Retour</a>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Cursor ──────────────────────────────────────
+const cur=document.getElementById('cur'),ring=document.getElementById('curRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX;my=e.clientY;
+  cur.style.left=mx-6+'px';cur.style.top=my-6+'px';
+});
+(function anim(){
+  rx+=(mx-rx-20)*.12;ry+=(my-ry-20)*.12;
+  ring.style.left=rx+'px';ring.style.top=ry+'px';
+  requestAnimationFrame(anim);
+})();
+document.querySelectorAll('a,button,.pay-method,.feat-card,.deploy-card,.fire-card,.stab,.chip,.df-step').forEach(el=>{
+  el.addEventListener('mouseenter',()=>document.body.classList.add('hov'));
+  el.addEventListener('mouseleave',()=>document.body.classList.remove('hov'));
+});
+
+// ── Toast ──────────────────────────────────────
+let toastT;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+// ── Intersection Observer ─────────────────────
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.style.opacity='1';
+      e.target.style.transform='translateY(0)';
+    }
+  });
+},{threshold:.12});
+document.querySelectorAll('.feat-card,.fire-card,.deploy-card,.backend-card,.pay-method,.archi-item').forEach(el=>{
+  el.style.opacity='0';el.style.transform='translateY(20px)';el.style.transition='all .6s cubic-bezier(.16,1,.3,1)';
+  observer.observe(el);
+});
+
+// ── Phone screen auto-change ──────────────────
+let screenIdx=0;
+const screens=[
+  `<div class="screen-nav"><div class="screen-logo">Market<span>SN</span></div><div class="s-cart">🛒<div class="s-badge">3</div></div></div><div class="s-search">🔍 <span>Rechercher...</span></div><div class="s-cats"><div class="s-cat on">Tout</div><div class="s-cat">🎨</div><div class="s-cat">🥘</div><div class="s-cat">👗</div></div><div class="s-section-title">TENDANCE 🔥</div><div class="s-grid"><div class="s-card"><div class="s-card-img" style="background:#FFF0E8">🧵</div><div class="s-card-body"><div class="s-card-name">Tissu Bazin</div><div class="s-card-shop">Diallo</div><div class="s-card-foot"><div class="s-price">8 500 F</div><div class="s-add">+</div></div></div></div><div class="s-card"><div class="s-card-img" style="background:#E8F5E9">🍛</div><div class="s-card-body"><div class="s-card-name">Thiéboudienne</div><div class="s-card-shop">Yaye Fatou</div><div class="s-card-foot"><div class="s-price">3 000 F</div><div class="s-add">+</div></div></div></div></div><div class="s-tab"><div class="s-tab-item on"><div class="s-tab-icon">🏠</div>Home</div><div class="s-tab-item"><div class="s-tab-icon">🔍</div>Search</div><div class="s-tab-item"><div class="s-tab-icon">🛒</div>Cart</div><div class="s-tab-item"><div class="s-tab-icon">👤</div>Profil</div></div>`,
+  `<div style="height:110px;background:linear-gradient(135deg,#FFF0E8,#FFE4D0);display:flex;align-items:center;justify-content:center;font-size:50px;position:relative">🧵<div style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,.5);color:#fff;border-radius:20px;padding:3px 8px;font-size:8px">←</div></div><div style="padding:10px 12px"><div style="font-size:12px;font-weight:700;margin-bottom:4px">Tissu Bazin Brodé</div><div style="font-size:9px;color:#8A8A8A;margin-bottom:6px">Artisanat Diallo · ⭐ 4.9</div><div style="font-size:13px;font-weight:700;color:var(--wave);margin-bottom:8px">8 500 F</div><div style="font-size:8px;color:#6A6A6A;line-height:1.6;margin-bottom:8px">Tissu bazin de haute qualité, brodé à la main...</div><div style="background:var(--wave);color:#fff;padding:9px;border-radius:8px;font-size:9px;font-weight:700;text-align:center">Ajouter au panier</div></div><div class="s-tab"><div class="s-tab-item"><div class="s-tab-icon">🏠</div>Home</div><div class="s-tab-item on"><div class="s-tab-icon">🔍</div>Search</div><div class="s-tab-item"><div class="s-tab-icon">🛒</div>Cart</div><div class="s-tab-item"><div class="s-tab-icon">👤</div>Profil</div></div>`,
+  `<div style="padding:12px 12px 8px;font-size:12px;font-weight:700">Mon Panier (3)</div><div style="padding:0 12px;display:flex;flex-direction:column;gap:6px"><div style="background:#fff;border-radius:8px;border:1px solid #F0EEE8;padding:8px;display:flex;gap:8px;align-items:center"><div style="width:32px;height:32px;background:#FFF0E8;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px">🧵</div><div style="flex:1"><div style="font-size:9px;font-weight:700">Tissu Bazin</div><div style="font-size:9px;color:var(--wave);font-weight:700">8 500 F</div></div><div style="display:flex;align-items:center;gap:6px"><div style="width:16px;height:16px;border-radius:3px;border:1px solid #E0E0E0;display:flex;align-items:center;justify-content:center;font-size:9px">−</div><div style="font-size:9px;font-weight:700">1</div><div style="width:16px;height:16px;border-radius:3px;background:var(--wave);display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff">+</div></div></div></div><div style="position:absolute;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #F0EEE8;padding:10px 12px"><div style="display:flex;justify-content:space-between;font-size:9px;margin-bottom:4px"><span>Sous-total</span><span>14 500 F</span></div><div style="display:flex;justify-content:space-between;font-size:10px;font-weight:700;margin-bottom:8px"><span>TOTAL</span><span style="color:var(--wave)">16 000 F</span></div><div style="background:var(--wave);color:#fff;padding:9px;border-radius:8px;font-size:9px;font-weight:700;text-align:center">Payer via Wave →</div></div><div class="s-tab" style="position:absolute;bottom:100px;left:0;right:0"><div class="s-tab-item"><div class="s-tab-icon">🏠</div>Home</div><div class="s-tab-item"><div class="s-tab-icon">🔍</div>Search</div><div class="s-tab-item on"><div class="s-tab-icon">🛒</div>Cart</div><div class="s-tab-item"><div class="s-tab-icon">👤</div>Profil</div></div>`
+];
+function rotateScreen(){
+  const phoneScreen=document.querySelector('.phone-screen');
+  if(!phoneScreen)return;
+  screenIdx=(screenIdx+1)%screens.length;
+  phoneScreen.style.opacity='0';
+  setTimeout(()=>{
+    phoneScreen.innerHTML=screens[screenIdx];
+    phoneScreen.style.opacity='1';
+    phoneScreen.style.transition='opacity .4s';
+  },300);
+}
+setInterval(rotateScreen,3500);
+</script>
+</body>
+</html>
